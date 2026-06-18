@@ -27,6 +27,8 @@ final class SkillingMethod
     private static final int BOW_STRING = 1777;
     private static final int FEATHER = 314;
     private static final int FISHING_BAIT = 313;
+    private static final int JUG_OF_WINE = 1993;
+    private static final int SUNFIRE_SPLINTERS = 28924;
 
     static final List<SkillingMethod> ALL_METHODS = Collections.unmodifiableList(Arrays.asList(
         // Smithing - smelting
@@ -262,6 +264,44 @@ final class SkillingMethod
             req(q(25775, "Abyssal ashes", 1)), none(), none()),
         m(Skill.PRAYER, "Scatter infernal ashes", 1, 110.0,
             req(q(25772, "Infernal ashes", 1)), none(), none()),
+
+        // Prayer - Varlamore libation bowl. Wine quantities are fractional per bone and rounded up over the full result.
+        m(Skill.PRAYER, "Libation bowl - big bones (wine)", 30, 60.0,
+            libationWine(532, "Big bones", 60.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - big bones (sunfire wine)", 30, 72.0,
+            libationSunfireWine(532, "Big bones", 60.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - baby dragon bones (wine)", 30, 120.0,
+            libationWine(534, "Babydragon bones", 120.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - baby dragon bones (sunfire wine)", 30, 144.0,
+            libationSunfireWine(534, "Babydragon bones", 120.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - dragon bones (wine)", 30, 290.0,
+            libationWine(536, "Dragon bones", 290.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - dragon bones (sunfire wine)", 30, 348.0,
+            libationSunfireWine(536, "Dragon bones", 290.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - wyvern bones (wine)", 30, 290.0,
+            libationWine(6812, "Wyvern bones", 290.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - wyvern bones (sunfire wine)", 30, 348.0,
+            libationSunfireWine(6812, "Wyvern bones", 290.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - fayrg bones (wine)", 30, 335.0,
+            libationWine(4830, "Fayrg bones", 335.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - fayrg bones (sunfire wine)", 30, 402.0,
+            libationSunfireWine(4830, "Fayrg bones", 335.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - frost dragon bones (wine)", 30, 420.0,
+            libationWine(31729, "Frost dragon bones", 420.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - frost dragon bones (sunfire wine)", 30, 504.0,
+            libationSunfireWine(31729, "Frost dragon bones", 420.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - hydra bones (wine)", 30, 465.0,
+            libationWine(22786, "Hydra bones", 465.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - hydra bones (sunfire wine)", 30, 558.0,
+            libationSunfireWine(22786, "Hydra bones", 465.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - dagannoth bones (wine)", 30, 500.0,
+            libationWine(6729, "Dagannoth bones", 500.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - dagannoth bones (sunfire wine)", 30, 600.0,
+            libationSunfireWine(6729, "Dagannoth bones", 500.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - superior dragon bones (wine)", 70, 605.0,
+            libationWine(22124, "Superior dragon bones", 605.0), none(), none()),
+        m(Skill.PRAYER, "Libation bowl - superior dragon bones (sunfire wine)", 70, 726.0,
+            libationSunfireWine(22124, "Superior dragon bones", 605.0), none(), none()),
 
         // Crafting - leather and d'hide
         m(Skill.CRAFTING, "Leather gloves", 1, 13.8,
@@ -638,20 +678,29 @@ final class SkillingMethod
         Set<Integer> ids = new LinkedHashSet<>();
         for (ItemQuantity input : requiredInputs)
         {
-            ids.add(input.getItemId());
+            if (!input.hasFixedUnitPrice())
+            {
+                ids.add(input.getItemId());
+            }
         }
         if (includeOptionalInputs)
         {
             for (ItemQuantity input : optionalInputs)
             {
-                ids.add(input.getItemId());
+                if (!input.hasFixedUnitPrice())
+                {
+                    ids.add(input.getItemId());
+                }
             }
         }
         if (sellOutputs)
         {
             for (ItemQuantity output : outputs)
             {
-                ids.add(output.getItemId());
+                if (!output.hasFixedUnitPrice())
+                {
+                    ids.add(output.getItemId());
+                }
             }
         }
         return ids;
@@ -687,10 +736,33 @@ final class SkillingMethod
         return new ItemQuantity(itemId, name, quantity);
     }
 
+    private static ItemQuantity gp(String name, double quantity, int unitPrice)
+    {
+        return new ItemQuantity(-1, name, quantity, true, unitPrice);
+    }
 
     private static List<ItemQuantity> req(ItemQuantity... items)
     {
         return Arrays.asList(items);
+    }
+
+    private static List<ItemQuantity> libationWine(int boneItemId, String boneName, double regularWineXpPerBone)
+    {
+        return req(
+            q(boneItemId, boneName, 1),
+            gp("Virilis unnoting fee", 1, 10),
+            q(JUG_OF_WINE, "Jug of wine", regularWineXpPerBone / 2000.0)
+        );
+    }
+
+    private static List<ItemQuantity> libationSunfireWine(int boneItemId, String boneName, double regularWineXpPerBone)
+    {
+        return req(
+            q(boneItemId, boneName, 1),
+            gp("Virilis unnoting fee", 1, 10),
+            q(JUG_OF_WINE, "Jug of wine", regularWineXpPerBone / 2000.0),
+            q(SUNFIRE_SPLINTERS, "Sunfire splinters", regularWineXpPerBone / 1000.0)
+        );
     }
 
     private static List<ItemQuantity> opt(ItemQuantity... items)

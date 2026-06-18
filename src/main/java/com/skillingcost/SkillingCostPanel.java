@@ -308,8 +308,11 @@ final class SkillingCostPanel extends PluginPanel
         syncingFields = true;
         setLevelSpinner(currentLevel, 1);
         setXpSpinner(currentXp, 0);
+        setTargetToNextLevelFromCurrent();
         syncSpinnerEditor(currentLevel);
         syncSpinnerEditor(currentXp);
+        syncSpinnerEditor(targetLevel);
+        syncSpinnerEditor(targetXp);
         syncingFields = false;
     }
 
@@ -554,8 +557,11 @@ final class SkillingCostPanel extends PluginPanel
             syncingFields = true;
             setXpSpinner(currentXp, xp);
             setLevelSpinner(currentLevel, levelForXp(xp));
+            setTargetToNextLevelFromCurrent();
             syncSpinnerEditor(currentXp);
             syncSpinnerEditor(currentLevel);
+            syncSpinnerEditor(targetLevel);
+            syncSpinnerEditor(targetXp);
             syncingFields = false;
             updateMethodOrdering(false);
 
@@ -602,6 +608,7 @@ final class SkillingCostPanel extends PluginPanel
             }
             syncingFields = true;
             setXpSpinner(currentXp, Experience.getXpForLevel(((Number) currentLevel.getValue()).intValue()));
+            setTargetToNextLevelFromCurrent();
             syncingFields = false;
             onInputsAffectingMethodListChanged("Current XP changed. Recalculate when ready.");
         });
@@ -613,6 +620,7 @@ final class SkillingCostPanel extends PluginPanel
             }
             syncingFields = true;
             setLevelSpinner(currentLevel, levelForXp(((Number) currentXp.getValue()).intValue()));
+            setTargetToNextLevelFromCurrent();
             syncingFields = false;
             onInputsAffectingMethodListChanged("Current XP changed. Recalculate when ready.");
         });
@@ -712,6 +720,13 @@ final class SkillingCostPanel extends PluginPanel
             JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
             editor.getTextField().setValue(spinner.getValue());
         }
+    }
+
+    private void setTargetToNextLevelFromCurrent()
+    {
+        int nextLevel = Math.min(MAX_SKILL_LEVEL, ((Number) currentLevel.getValue()).intValue() + 1);
+        setLevelSpinner(targetLevel, nextLevel);
+        setXpSpinner(targetXp, Experience.getXpForLevel(nextLevel));
     }
 
     private static int levelForXp(int xp)

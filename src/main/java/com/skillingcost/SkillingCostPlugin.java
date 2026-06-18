@@ -206,7 +206,7 @@ public class SkillingCostPlugin extends Plugin
         for (ItemQuantity input : method.getRequiredInputs())
         {
             WikiPrice price = prices.get(input.getItemId());
-            int unitBuy = price == null ? 0 : price.getInstantBuyPrice();
+            int unitBuy = input.hasFixedUnitPrice() ? input.getFixedUnitPrice() : price == null ? 0 : price.getInstantBuyPrice();
             inputCost += input.getTotalQuantity(actionsNeeded) * unitBuy;
         }
 
@@ -215,7 +215,7 @@ public class SkillingCostPlugin extends Plugin
             for (ItemQuantity input : method.getOptionalInputs())
             {
                 WikiPrice price = prices.get(input.getItemId());
-                int unitBuy = price == null ? 0 : price.getInstantBuyPrice();
+                int unitBuy = input.hasFixedUnitPrice() ? input.getFixedUnitPrice() : price == null ? 0 : price.getInstantBuyPrice();
                 inputCost += input.getTotalQuantity(actionsNeeded) * unitBuy;
             }
         }
@@ -320,10 +320,10 @@ public class SkillingCostPlugin extends Plugin
     private LinePrice priceInput(ItemQuantity item, long actionsNeeded, Map<Integer, WikiPrice> prices, boolean optional)
     {
         WikiPrice price = prices.get(item.getItemId());
-        int unitBuy = price == null ? 0 : price.getInstantBuyPrice();
+        int unitBuy = item.hasFixedUnitPrice() ? item.getFixedUnitPrice() : price == null ? 0 : price.getInstantBuyPrice();
         long quantity = item.getTotalQuantity(actionsNeeded);
         long total = quantity * unitBuy;
-        long timestamp = price == null ? 0 : price.getNewestTimestamp();
+        long timestamp = item.hasFixedUnitPrice() || price == null ? 0 : price.getNewestTimestamp();
         String name = optional ? item.getName() + " (optional)" : item.getName();
         return new LinePrice(formatItemLine(name, quantity, unitBuy, total), total, timestamp);
     }
