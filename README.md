@@ -49,3 +49,14 @@ This plugin is inteded to calculate the cost/profit/loss for skilling methods. Y
 | **Total** | **235** |
 
 ## Notes
+
+Prayer is kind of a mess, unfortunately
+
+Each method (bury, altar, libation bowl) has a separate entry for each bone and way of doing the method
+
+And the method list might need to be scrolled over to see the full name
+
+<img width="237" height="167" alt="SCR-20260618-ncic" src="https://github.com/user-attachments/assets/75723579-f148-4c79-bce4-5aec4545629d" />
+<img width="239" height="159" alt="SCR-20260618-ncjl" src="https://github.com/user-attachments/assets/af92d70b-0520-4dd8-a064-50696d903135" />
+
+
