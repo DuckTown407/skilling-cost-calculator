@@ -4,13 +4,13 @@ This plugin is inteded to calculate the cost/profit/loss for skilling methods. Y
 
 ## Current scope
 
--Much like the skill calculator this plugin can read your current skill level/XP and allows manual input
--Automatically attemps to read your current XP when switching skills
--You can choose what level/XP you'd like to get to
--Provides a list of available methods than be sorted by least action or most profit (least lost in most cases)
--Method list is scrollable
--Optionally add the cost of extra supplies (like thread for d'hide)
--Able to look at smithing methods by buying bars or making bars
+- Much like the skill calculator this plugin can read your current skill level/XP and allows manual input
+- Automatically attemps to read your current XP when switching skills
+- You can choose what level/XP you'd like to get to
+- Provides a list of available methods than be sorted by least action or most profit (least lost in most cases)
+- Method list is scrollable
+- Optionally add the cost of extra supplies (like thread for d'hide)
+- Able to look at smithing methods by buying bars or making bars
 
 ## Method counts
 
