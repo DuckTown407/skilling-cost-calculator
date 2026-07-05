@@ -1,0 +1,6296 @@
+{
+ "skills": [
+  "SMITHING",
+  "HERBLORE",
+  "FISHING",
+  "COOKING",
+  "PRAYER",
+  "CRAFTING",
+  "FIREMAKING",
+  "MAGIC",
+  "FLETCHING",
+  "RUNECRAFT",
+  "CONSTRUCTION"
+ ],
+ "methods": [
+  {
+   "skill": "SMITHING",
+   "name": "Smelt bronze bar",
+   "level": 1,
+   "xp": 6.2,
+   "inputs": [
+    {
+     "id": 436,
+     "name": "Copper ore",
+     "qty": 1.0
+    },
+    {
+     "id": 438,
+     "name": "Tin ore",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2349,
+     "name": "Bronze bar",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Smelt iron bar",
+   "level": 15,
+   "xp": 12.5,
+   "inputs": [
+    {
+     "id": 440,
+     "name": "Iron ore",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2351,
+     "name": "Iron bar",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Smelt silver bar",
+   "level": 20,
+   "xp": 13.7,
+   "inputs": [
+    {
+     "id": 442,
+     "name": "Silver ore",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2355,
+     "name": "Silver bar",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Smelt steel bar",
+   "level": 30,
+   "xp": 17.5,
+   "inputs": [
+    {
+     "id": 440,
+     "name": "Iron ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 2.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2353,
+     "name": "Steel bar",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Smelt gold bar",
+   "level": 40,
+   "xp": 22.5,
+   "inputs": [
+    {
+     "id": 444,
+     "name": "Gold ore",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    }
+   ],
+   "group": "Smelt gold bar",
+   "variant": "No gauntlets"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Smelt gold bar - goldsmith gauntlets",
+   "level": 40,
+   "xp": 56.2,
+   "inputs": [
+    {
+     "id": 444,
+     "name": "Gold ore",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    }
+   ],
+   "group": "Smelt gold bar",
+   "variant": "Goldsmith gauntlets"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Smelt mithril bar",
+   "level": 50,
+   "xp": 30.0,
+   "inputs": [
+    {
+     "id": 447,
+     "name": "Mithril ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 4.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2359,
+     "name": "Mithril bar",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Smelt adamantite bar",
+   "level": 70,
+   "xp": 37.5,
+   "inputs": [
+    {
+     "id": 449,
+     "name": "Adamantite ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 6.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2361,
+     "name": "Adamantite bar",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Smelt runite bar",
+   "level": 85,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 451,
+     "name": "Runite ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 8.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2363,
+     "name": "Runite bar",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Cannonballs (buy bars)",
+   "level": 35,
+   "xp": 25.6,
+   "inputs": [
+    {
+     "id": 2353,
+     "name": "Steel bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2,
+     "name": "Cannonball",
+     "qty": 4.0
+    }
+   ],
+   "group": "Cannonballs",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Bronze platebody (buy bars)",
+   "level": 18,
+   "xp": 62.5,
+   "inputs": [
+    {
+     "id": 2349,
+     "name": "Bronze bar",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1117,
+     "name": "Bronze platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Bronze platebody",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Iron platebody (buy bars)",
+   "level": 33,
+   "xp": 125.0,
+   "inputs": [
+    {
+     "id": 2351,
+     "name": "Iron bar",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1115,
+     "name": "Iron platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Iron platebody",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Steel platebody (buy bars)",
+   "level": 48,
+   "xp": 187.5,
+   "inputs": [
+    {
+     "id": 2353,
+     "name": "Steel bar",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1119,
+     "name": "Steel platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Steel platebody",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Mithril platebody (buy bars)",
+   "level": 68,
+   "xp": 250.0,
+   "inputs": [
+    {
+     "id": 2359,
+     "name": "Mithril bar",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1121,
+     "name": "Mithril platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Mithril platebody",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Adamant platebody (buy bars)",
+   "level": 88,
+   "xp": 312.5,
+   "inputs": [
+    {
+     "id": 2361,
+     "name": "Adamantite bar",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1123,
+     "name": "Adamant platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Adamant platebody",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Rune platebody (buy bars)",
+   "level": 99,
+   "xp": 375.0,
+   "inputs": [
+    {
+     "id": 2363,
+     "name": "Runite bar",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1127,
+     "name": "Rune platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Rune platebody",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Bronze dart tips (buy bars)",
+   "level": 4,
+   "xp": 12.5,
+   "inputs": [
+    {
+     "id": 2349,
+     "name": "Bronze bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 819,
+     "name": "Bronze dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Bronze dart tips",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Iron dart tips (buy bars)",
+   "level": 19,
+   "xp": 25.0,
+   "inputs": [
+    {
+     "id": 2351,
+     "name": "Iron bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 820,
+     "name": "Iron dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Iron dart tips",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Steel dart tips (buy bars)",
+   "level": 34,
+   "xp": 37.5,
+   "inputs": [
+    {
+     "id": 2353,
+     "name": "Steel bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 821,
+     "name": "Steel dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Steel dart tips",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Mithril dart tips (buy bars)",
+   "level": 54,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 2359,
+     "name": "Mithril bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 822,
+     "name": "Mithril dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Mithril dart tips",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Adamant dart tips (buy bars)",
+   "level": 74,
+   "xp": 62.5,
+   "inputs": [
+    {
+     "id": 2361,
+     "name": "Adamantite bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 823,
+     "name": "Adamant dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Adamant dart tips",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Rune dart tips (buy bars)",
+   "level": 89,
+   "xp": 75.0,
+   "inputs": [
+    {
+     "id": 2363,
+     "name": "Runite bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 824,
+     "name": "Rune dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Rune dart tips",
+   "variant": "Buy bars"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Cannonballs (smelt bars)",
+   "level": 35,
+   "xp": 43.1,
+   "inputs": [
+    {
+     "id": 440,
+     "name": "Iron ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 2.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2,
+     "name": "Cannonball",
+     "qty": 4.0
+    }
+   ],
+   "group": "Cannonballs",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Bronze platebody (smelt bars)",
+   "level": 18,
+   "xp": 93.5,
+   "inputs": [
+    {
+     "id": 436,
+     "name": "Copper ore",
+     "qty": 5.0
+    },
+    {
+     "id": 438,
+     "name": "Tin ore",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1117,
+     "name": "Bronze platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Bronze platebody",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Iron platebody (smelt bars)",
+   "level": 33,
+   "xp": 187.5,
+   "inputs": [
+    {
+     "id": 440,
+     "name": "Iron ore",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1115,
+     "name": "Iron platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Iron platebody",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Steel platebody (smelt bars)",
+   "level": 48,
+   "xp": 275.0,
+   "inputs": [
+    {
+     "id": 440,
+     "name": "Iron ore",
+     "qty": 5.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1119,
+     "name": "Steel platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Steel platebody",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Mithril platebody (smelt bars)",
+   "level": 68,
+   "xp": 400.0,
+   "inputs": [
+    {
+     "id": 447,
+     "name": "Mithril ore",
+     "qty": 5.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 20.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1121,
+     "name": "Mithril platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Mithril platebody",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Adamant platebody (smelt bars)",
+   "level": 88,
+   "xp": 500.0,
+   "inputs": [
+    {
+     "id": 449,
+     "name": "Adamantite ore",
+     "qty": 5.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 30.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1123,
+     "name": "Adamant platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Adamant platebody",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Rune platebody (smelt bars)",
+   "level": 99,
+   "xp": 625.0,
+   "inputs": [
+    {
+     "id": 451,
+     "name": "Runite ore",
+     "qty": 5.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 40.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1127,
+     "name": "Rune platebody",
+     "qty": 1.0
+    }
+   ],
+   "group": "Rune platebody",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Bronze dart tips (smelt bars)",
+   "level": 4,
+   "xp": 18.7,
+   "inputs": [
+    {
+     "id": 436,
+     "name": "Copper ore",
+     "qty": 1.0
+    },
+    {
+     "id": 438,
+     "name": "Tin ore",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 819,
+     "name": "Bronze dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Bronze dart tips",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Iron dart tips (smelt bars)",
+   "level": 19,
+   "xp": 37.5,
+   "inputs": [
+    {
+     "id": 440,
+     "name": "Iron ore",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 820,
+     "name": "Iron dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Iron dart tips",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Steel dart tips (smelt bars)",
+   "level": 34,
+   "xp": 55.0,
+   "inputs": [
+    {
+     "id": 440,
+     "name": "Iron ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 2.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 821,
+     "name": "Steel dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Steel dart tips",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Mithril dart tips (smelt bars)",
+   "level": 54,
+   "xp": 80.0,
+   "inputs": [
+    {
+     "id": 447,
+     "name": "Mithril ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 4.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 822,
+     "name": "Mithril dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Mithril dart tips",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Adamant dart tips (smelt bars)",
+   "level": 74,
+   "xp": 100.0,
+   "inputs": [
+    {
+     "id": 449,
+     "name": "Adamantite ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 6.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 823,
+     "name": "Adamant dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Adamant dart tips",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "SMITHING",
+   "name": "Rune dart tips (smelt bars)",
+   "level": 89,
+   "xp": 125.0,
+   "inputs": [
+    {
+     "id": 451,
+     "name": "Runite ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 8.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 824,
+     "name": "Rune dart tip",
+     "qty": 10.0
+    }
+   ],
+   "group": "Rune dart tips",
+   "variant": "Smelt bars from ore"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean guam leaf",
+   "level": 3,
+   "xp": 2.5,
+   "inputs": [
+    {
+     "id": 199,
+     "name": "Grimy guam leaf",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 249,
+     "name": "Guam leaf",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Guam leaf"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean marrentill",
+   "level": 5,
+   "xp": 3.8,
+   "inputs": [
+    {
+     "id": 201,
+     "name": "Grimy marrentill",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 251,
+     "name": "Marrentill",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Marrentill"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean tarromin",
+   "level": 11,
+   "xp": 5.0,
+   "inputs": [
+    {
+     "id": 203,
+     "name": "Grimy tarromin",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 253,
+     "name": "Tarromin",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Tarromin"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean harralander",
+   "level": 20,
+   "xp": 6.3,
+   "inputs": [
+    {
+     "id": 205,
+     "name": "Grimy harralander",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 255,
+     "name": "Harralander",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Harralander"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean ranarr weed",
+   "level": 25,
+   "xp": 7.5,
+   "inputs": [
+    {
+     "id": 207,
+     "name": "Grimy ranarr weed",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 257,
+     "name": "Ranarr weed",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Ranarr weed"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean toadflax",
+   "level": 30,
+   "xp": 8.0,
+   "inputs": [
+    {
+     "id": 3049,
+     "name": "Grimy toadflax",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2998,
+     "name": "Toadflax",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Toadflax"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean irit leaf",
+   "level": 40,
+   "xp": 8.8,
+   "inputs": [
+    {
+     "id": 209,
+     "name": "Grimy irit leaf",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 259,
+     "name": "Irit leaf",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Irit leaf"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean avantoe",
+   "level": 48,
+   "xp": 10.0,
+   "inputs": [
+    {
+     "id": 211,
+     "name": "Grimy avantoe",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 261,
+     "name": "Avantoe",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Avantoe"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean kwuarm",
+   "level": 54,
+   "xp": 11.3,
+   "inputs": [
+    {
+     "id": 213,
+     "name": "Grimy kwuarm",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 263,
+     "name": "Kwuarm",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Kwuarm"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean snapdragon",
+   "level": 59,
+   "xp": 11.8,
+   "inputs": [
+    {
+     "id": 3051,
+     "name": "Grimy snapdragon",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3000,
+     "name": "Snapdragon",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Snapdragon"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean cadantine",
+   "level": 65,
+   "xp": 12.5,
+   "inputs": [
+    {
+     "id": 215,
+     "name": "Grimy cadantine",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 265,
+     "name": "Cadantine",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Cadantine"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean lantadyme",
+   "level": 67,
+   "xp": 13.1,
+   "inputs": [
+    {
+     "id": 2485,
+     "name": "Grimy lantadyme",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2481,
+     "name": "Lantadyme",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Lantadyme"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean dwarf weed",
+   "level": 70,
+   "xp": 13.8,
+   "inputs": [
+    {
+     "id": 217,
+     "name": "Grimy dwarf weed",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 267,
+     "name": "Dwarf weed",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Dwarf weed"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Clean torstol",
+   "level": 75,
+   "xp": 15.0,
+   "inputs": [
+    {
+     "id": 219,
+     "name": "Grimy torstol",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 269,
+     "name": "Torstol",
+     "qty": 1.0
+    }
+   ],
+   "group": "Clean grimy herbs",
+   "variant": "Torstol"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Attack potion",
+   "level": 3,
+   "xp": 25.0,
+   "inputs": [
+    {
+     "id": 91,
+     "name": "Guam potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 221,
+     "name": "Eye of newt",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 121,
+     "name": "Attack potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Antipoison",
+   "level": 5,
+   "xp": 37.5,
+   "inputs": [
+    {
+     "id": 93,
+     "name": "Marrentill potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 235,
+     "name": "Unicorn horn dust",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 175,
+     "name": "Antipoison(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Strength potion",
+   "level": 12,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 95,
+     "name": "Tarromin potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 225,
+     "name": "Limpwurt root",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 115,
+     "name": "Strength potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Serum 207",
+   "level": 15,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 95,
+     "name": "Tarromin potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 592,
+     "name": "Ashes",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3410,
+     "name": "Serum 207(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Restore potion",
+   "level": 22,
+   "xp": 62.5,
+   "inputs": [
+    {
+     "id": 97,
+     "name": "Harralander potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 223,
+     "name": "Red spiders' eggs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 127,
+     "name": "Restore potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Energy potion",
+   "level": 26,
+   "xp": 67.5,
+   "inputs": [
+    {
+     "id": 97,
+     "name": "Harralander potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 1975,
+     "name": "Chocolate dust",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3010,
+     "name": "Energy potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Defence potion",
+   "level": 30,
+   "xp": 75.0,
+   "inputs": [
+    {
+     "id": 99,
+     "name": "Ranarr potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 239,
+     "name": "White berries",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 133,
+     "name": "Defence potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Agility potion",
+   "level": 34,
+   "xp": 80.0,
+   "inputs": [
+    {
+     "id": 3002,
+     "name": "Toadflax potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 2152,
+     "name": "Toad's legs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3034,
+     "name": "Agility potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Combat potion",
+   "level": 36,
+   "xp": 84.0,
+   "inputs": [
+    {
+     "id": 97,
+     "name": "Harralander potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 9736,
+     "name": "Goat horn dust",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 9741,
+     "name": "Combat potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Prayer potion",
+   "level": 38,
+   "xp": 87.5,
+   "inputs": [
+    {
+     "id": 99,
+     "name": "Ranarr potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 231,
+     "name": "Snape grass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 139,
+     "name": "Prayer potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": "Prayer potion",
+   "variant": "From unf potion"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Prayer potion (from clean herb)",
+   "level": 38,
+   "xp": 87.5,
+   "inputs": [
+    {
+     "id": 257,
+     "name": "Ranarr weed",
+     "qty": 1.0
+    },
+    {
+     "id": 227,
+     "name": "Vial of water",
+     "qty": 1.0
+    },
+    {
+     "id": 231,
+     "name": "Snape grass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 139,
+     "name": "Prayer potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": "Prayer potion",
+   "variant": "From clean herb"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Super attack",
+   "level": 45,
+   "xp": 100.0,
+   "inputs": [
+    {
+     "id": 101,
+     "name": "Irit potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 221,
+     "name": "Eye of newt",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 145,
+     "name": "Super attack(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Superantipoison",
+   "level": 48,
+   "xp": 106.3,
+   "inputs": [
+    {
+     "id": 101,
+     "name": "Irit potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 235,
+     "name": "Unicorn horn dust",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 181,
+     "name": "Superantipoison(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Fishing potion",
+   "level": 50,
+   "xp": 112.5,
+   "inputs": [
+    {
+     "id": 103,
+     "name": "Avantoe potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 231,
+     "name": "Snape grass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 151,
+     "name": "Fishing potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Super energy",
+   "level": 52,
+   "xp": 117.5,
+   "inputs": [
+    {
+     "id": 103,
+     "name": "Avantoe potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 2970,
+     "name": "Mort myre fungus",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3018,
+     "name": "Super energy(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Hunter potion",
+   "level": 53,
+   "xp": 120.0,
+   "inputs": [
+    {
+     "id": 103,
+     "name": "Avantoe potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 10111,
+     "name": "Kebbit teeth dust",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 10000,
+     "name": "Hunter potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Super strength",
+   "level": 55,
+   "xp": 125.0,
+   "inputs": [
+    {
+     "id": 105,
+     "name": "Kwuarm potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 225,
+     "name": "Limpwurt root",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 157,
+     "name": "Super strength(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Weapon poison",
+   "level": 60,
+   "xp": 137.5,
+   "inputs": [
+    {
+     "id": 105,
+     "name": "Kwuarm potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 241,
+     "name": "Dragon scale dust",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 187,
+     "name": "Weapon poison",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Super restore",
+   "level": 63,
+   "xp": 142.5,
+   "inputs": [
+    {
+     "id": 3004,
+     "name": "Snapdragon potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 223,
+     "name": "Red spiders' eggs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3024,
+     "name": "Super restore(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": "Super restore",
+   "variant": "From unf potion"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Super restore (from clean herb)",
+   "level": 63,
+   "xp": 142.5,
+   "inputs": [
+    {
+     "id": 3000,
+     "name": "Snapdragon",
+     "qty": 1.0
+    },
+    {
+     "id": 227,
+     "name": "Vial of water",
+     "qty": 1.0
+    },
+    {
+     "id": 223,
+     "name": "Red spiders' eggs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3024,
+     "name": "Super restore(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": "Super restore",
+   "variant": "From clean herb"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Super defence",
+   "level": 66,
+   "xp": 150.0,
+   "inputs": [
+    {
+     "id": 107,
+     "name": "Cadantine potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 239,
+     "name": "White berries",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 163,
+     "name": "Super defence(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Antifire potion",
+   "level": 69,
+   "xp": 157.5,
+   "inputs": [
+    {
+     "id": 2483,
+     "name": "Lantadyme potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 241,
+     "name": "Dragon scale dust",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2454,
+     "name": "Antifire potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Ranging potion",
+   "level": 72,
+   "xp": 162.5,
+   "inputs": [
+    {
+     "id": 109,
+     "name": "Dwarf weed potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 245,
+     "name": "Wine of zamorak",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 169,
+     "name": "Ranging potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": "Ranging potion",
+   "variant": "From unf potion"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Ranging potion (from clean herb)",
+   "level": 72,
+   "xp": 162.5,
+   "inputs": [
+    {
+     "id": 267,
+     "name": "Dwarf weed",
+     "qty": 1.0
+    },
+    {
+     "id": 227,
+     "name": "Vial of water",
+     "qty": 1.0
+    },
+    {
+     "id": 245,
+     "name": "Wine of zamorak",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 169,
+     "name": "Ranging potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": "Ranging potion",
+   "variant": "From clean herb"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Magic potion",
+   "level": 76,
+   "xp": 172.5,
+   "inputs": [
+    {
+     "id": 2483,
+     "name": "Lantadyme potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 3138,
+     "name": "Potato cactus",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3042,
+     "name": "Magic potion(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Zamorak brew",
+   "level": 78,
+   "xp": 175.0,
+   "inputs": [
+    {
+     "id": 111,
+     "name": "Torstol potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 245,
+     "name": "Wine of zamorak",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 189,
+     "name": "Zamorak brew(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Saradomin brew",
+   "level": 81,
+   "xp": 180.0,
+   "inputs": [
+    {
+     "id": 3002,
+     "name": "Toadflax potion (unf)",
+     "qty": 1.0
+    },
+    {
+     "id": 6693,
+     "name": "Crushed nest",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 6685,
+     "name": "Saradomin brew(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": "Saradomin brew",
+   "variant": "From unf potion"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Saradomin brew (from clean herb)",
+   "level": 81,
+   "xp": 180.0,
+   "inputs": [
+    {
+     "id": 2998,
+     "name": "Toadflax",
+     "qty": 1.0
+    },
+    {
+     "id": 227,
+     "name": "Vial of water",
+     "qty": 1.0
+    },
+    {
+     "id": 6693,
+     "name": "Crushed nest",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 6685,
+     "name": "Saradomin brew(3)",
+     "qty": 1.0
+    }
+   ],
+   "group": "Saradomin brew",
+   "variant": "From clean herb"
+  },
+  {
+   "skill": "HERBLORE",
+   "name": "Super combat potion",
+   "level": 90,
+   "xp": 150.0,
+   "inputs": [
+    {
+     "id": 145,
+     "name": "Super attack(3)",
+     "qty": 1.0
+    },
+    {
+     "id": 157,
+     "name": "Super strength(3)",
+     "qty": 1.0
+    },
+    {
+     "id": 163,
+     "name": "Super defence(3)",
+     "qty": 1.0
+    },
+    {
+     "id": 269,
+     "name": "Torstol",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 12695,
+     "name": "Super combat potion(4)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Net fishing - shrimps",
+   "level": 1,
+   "xp": 10.0,
+   "inputs": [],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 317,
+     "name": "Raw shrimps",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Bait fishing - sardine",
+   "level": 5,
+   "xp": 20.0,
+   "inputs": [
+    {
+     "id": 313,
+     "name": "Fishing bait",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 327,
+     "name": "Raw sardine",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Bait fishing - herring",
+   "level": 10,
+   "xp": 30.0,
+   "inputs": [
+    {
+     "id": 313,
+     "name": "Fishing bait",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 345,
+     "name": "Raw herring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Fly fishing - trout",
+   "level": 20,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 335,
+     "name": "Raw trout",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Fly fishing - salmon",
+   "level": 30,
+   "xp": 70.0,
+   "inputs": [
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 331,
+     "name": "Raw salmon",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Lobster",
+   "level": 40,
+   "xp": 90.0,
+   "inputs": [],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 377,
+     "name": "Raw lobster",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Swordfish",
+   "level": 50,
+   "xp": 100.0,
+   "inputs": [],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 371,
+     "name": "Raw swordfish",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Monkfish",
+   "level": 62,
+   "xp": 120.0,
+   "inputs": [],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 7944,
+     "name": "Raw monkfish",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Raw karambwan",
+   "level": 65,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 3150,
+     "name": "Raw karambwanji",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3142,
+     "name": "Raw karambwan",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Shark",
+   "level": 76,
+   "xp": 110.0,
+   "inputs": [],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 383,
+     "name": "Raw shark",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Anglerfish",
+   "level": 82,
+   "xp": 120.0,
+   "inputs": [],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 13439,
+     "name": "Raw anglerfish",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FISHING",
+   "name": "Dark crab",
+   "level": 85,
+   "xp": 130.0,
+   "inputs": [
+    {
+     "id": 313,
+     "name": "Fishing bait",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 11934,
+     "name": "Raw dark crab",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook shrimps",
+   "level": 1,
+   "xp": 30.0,
+   "inputs": [
+    {
+     "id": 317,
+     "name": "Raw shrimps",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 315,
+     "name": "Shrimps",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook anchovies",
+   "level": 1,
+   "xp": 30.0,
+   "inputs": [
+    {
+     "id": 321,
+     "name": "Raw anchovies",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 319,
+     "name": "Anchovies",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook sardine",
+   "level": 1,
+   "xp": 40.0,
+   "inputs": [
+    {
+     "id": 327,
+     "name": "Raw sardine",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 325,
+     "name": "Sardine",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook herring",
+   "level": 5,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 345,
+     "name": "Raw herring",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 347,
+     "name": "Herring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook mackerel",
+   "level": 10,
+   "xp": 60.0,
+   "inputs": [
+    {
+     "id": 353,
+     "name": "Raw mackerel",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 355,
+     "name": "Mackerel",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook trout",
+   "level": 15,
+   "xp": 70.0,
+   "inputs": [
+    {
+     "id": 335,
+     "name": "Raw trout",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 333,
+     "name": "Trout",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook cod",
+   "level": 18,
+   "xp": 75.0,
+   "inputs": [
+    {
+     "id": 341,
+     "name": "Raw cod",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 339,
+     "name": "Cod",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook pike",
+   "level": 20,
+   "xp": 80.0,
+   "inputs": [
+    {
+     "id": 349,
+     "name": "Raw pike",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 351,
+     "name": "Pike",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook salmon",
+   "level": 25,
+   "xp": 90.0,
+   "inputs": [
+    {
+     "id": 331,
+     "name": "Raw salmon",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 329,
+     "name": "Salmon",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook tuna",
+   "level": 30,
+   "xp": 100.0,
+   "inputs": [
+    {
+     "id": 359,
+     "name": "Raw tuna",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 361,
+     "name": "Tuna",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook lobster",
+   "level": 40,
+   "xp": 120.0,
+   "inputs": [
+    {
+     "id": 377,
+     "name": "Raw lobster",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 379,
+     "name": "Lobster",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook bass",
+   "level": 43,
+   "xp": 130.0,
+   "inputs": [
+    {
+     "id": 363,
+     "name": "Raw bass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 365,
+     "name": "Bass",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook swordfish",
+   "level": 45,
+   "xp": 140.0,
+   "inputs": [
+    {
+     "id": 371,
+     "name": "Raw swordfish",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 373,
+     "name": "Swordfish",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook monkfish",
+   "level": 62,
+   "xp": 150.0,
+   "inputs": [
+    {
+     "id": 7944,
+     "name": "Raw monkfish",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 7946,
+     "name": "Monkfish",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook karambwan",
+   "level": 30,
+   "xp": 190.0,
+   "inputs": [
+    {
+     "id": 3142,
+     "name": "Raw karambwan",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 3144,
+     "name": "Cooked karambwan",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook shark",
+   "level": 80,
+   "xp": 210.0,
+   "inputs": [
+    {
+     "id": 383,
+     "name": "Raw shark",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 385,
+     "name": "Shark",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook sea turtle",
+   "level": 82,
+   "xp": 211.3,
+   "inputs": [
+    {
+     "id": 395,
+     "name": "Raw sea turtle",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 397,
+     "name": "Sea turtle",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook manta ray",
+   "level": 91,
+   "xp": 216.3,
+   "inputs": [
+    {
+     "id": 389,
+     "name": "Raw manta ray",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 391,
+     "name": "Manta ray",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook dark crab",
+   "level": 90,
+   "xp": 215.0,
+   "inputs": [
+    {
+     "id": 11934,
+     "name": "Raw dark crab",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 11936,
+     "name": "Dark crab",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Cook anglerfish",
+   "level": 84,
+   "xp": 230.0,
+   "inputs": [
+    {
+     "id": 13439,
+     "name": "Raw anglerfish",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 13441,
+     "name": "Anglerfish",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "COOKING",
+   "name": "Make jug of wine",
+   "level": 35,
+   "xp": 200.0,
+   "inputs": [
+    {
+     "id": 1987,
+     "name": "Grapes",
+     "qty": 1.0
+    },
+    {
+     "id": 1937,
+     "name": "Jug of water",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1993,
+     "name": "Jug of wine",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Leather gloves",
+   "level": 1,
+   "xp": 13.8,
+   "inputs": [
+    {
+     "id": 1741,
+     "name": "Leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1059,
+     "name": "Leather gloves",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Leather boots",
+   "level": 7,
+   "xp": 16.3,
+   "inputs": [
+    {
+     "id": 1741,
+     "name": "Leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1061,
+     "name": "Leather boots",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Leather cowl",
+   "level": 9,
+   "xp": 18.5,
+   "inputs": [
+    {
+     "id": 1741,
+     "name": "Leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1167,
+     "name": "Leather cowl",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Hardleather body",
+   "level": 10,
+   "xp": 35.0,
+   "inputs": [
+    {
+     "id": 1743,
+     "name": "Hard leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1131,
+     "name": "Hardleather body",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Leather vambraces",
+   "level": 11,
+   "xp": 22.0,
+   "inputs": [
+    {
+     "id": 1741,
+     "name": "Leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1063,
+     "name": "Leather vambraces",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Leather body",
+   "level": 14,
+   "xp": 25.0,
+   "inputs": [
+    {
+     "id": 1741,
+     "name": "Leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1129,
+     "name": "Leather body",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Leather chaps",
+   "level": 18,
+   "xp": 27.0,
+   "inputs": [
+    {
+     "id": 1741,
+     "name": "Leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1095,
+     "name": "Leather chaps",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Green d'hide vambraces",
+   "level": 57,
+   "xp": 62.0,
+   "inputs": [
+    {
+     "id": 1745,
+     "name": "Green dragon leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1065,
+     "name": "Green d'hide vambraces",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Green d'hide chaps",
+   "level": 60,
+   "xp": 124.0,
+   "inputs": [
+    {
+     "id": 1745,
+     "name": "Green dragon leather",
+     "qty": 2.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1099,
+     "name": "Green d'hide chaps",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Green d'hide body",
+   "level": 63,
+   "xp": 186.0,
+   "inputs": [
+    {
+     "id": 1745,
+     "name": "Green dragon leather",
+     "qty": 3.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 1135,
+     "name": "Green d'hide body",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blue d'hide vambraces",
+   "level": 66,
+   "xp": 70.0,
+   "inputs": [
+    {
+     "id": 2505,
+     "name": "Blue dragon leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2487,
+     "name": "Blue d'hide vambraces",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blue d'hide chaps",
+   "level": 68,
+   "xp": 140.0,
+   "inputs": [
+    {
+     "id": 2505,
+     "name": "Blue dragon leather",
+     "qty": 2.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2493,
+     "name": "Blue d'hide chaps",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blue d'hide body",
+   "level": 71,
+   "xp": 210.0,
+   "inputs": [
+    {
+     "id": 2505,
+     "name": "Blue dragon leather",
+     "qty": 3.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2499,
+     "name": "Blue d'hide body",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Red d'hide vambraces",
+   "level": 73,
+   "xp": 78.0,
+   "inputs": [
+    {
+     "id": 2507,
+     "name": "Red dragon leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2489,
+     "name": "Red d'hide vambraces",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Red d'hide chaps",
+   "level": 75,
+   "xp": 156.0,
+   "inputs": [
+    {
+     "id": 2507,
+     "name": "Red dragon leather",
+     "qty": 2.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2495,
+     "name": "Red d'hide chaps",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Red d'hide body",
+   "level": 77,
+   "xp": 234.0,
+   "inputs": [
+    {
+     "id": 2507,
+     "name": "Red dragon leather",
+     "qty": 3.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2501,
+     "name": "Red d'hide body",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Black d'hide vambraces",
+   "level": 79,
+   "xp": 86.0,
+   "inputs": [
+    {
+     "id": 2509,
+     "name": "Black dragon leather",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2491,
+     "name": "Black d'hide vambraces",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Black d'hide chaps",
+   "level": 82,
+   "xp": 172.0,
+   "inputs": [
+    {
+     "id": 2509,
+     "name": "Black dragon leather",
+     "qty": 2.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2497,
+     "name": "Black d'hide chaps",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Black d'hide body",
+   "level": 84,
+   "xp": 258.0,
+   "inputs": [
+    {
+     "id": 2509,
+     "name": "Black dragon leather",
+     "qty": 3.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 1734,
+     "name": "Thread",
+     "qty": 0.2
+    }
+   ],
+   "outputs": [
+    {
+     "id": 2503,
+     "name": "Black d'hide body",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut opal",
+   "level": 1,
+   "xp": 15.0,
+   "inputs": [
+    {
+     "id": 1625,
+     "name": "Uncut opal",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1609,
+     "name": "Opal",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut jade",
+   "level": 13,
+   "xp": 20.0,
+   "inputs": [
+    {
+     "id": 1627,
+     "name": "Uncut jade",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1611,
+     "name": "Jade",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut red topaz",
+   "level": 16,
+   "xp": 25.0,
+   "inputs": [
+    {
+     "id": 1629,
+     "name": "Uncut red topaz",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1613,
+     "name": "Red topaz",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut sapphire",
+   "level": 20,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 1623,
+     "name": "Uncut sapphire",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1607,
+     "name": "Sapphire",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut emerald",
+   "level": 27,
+   "xp": 67.5,
+   "inputs": [
+    {
+     "id": 1621,
+     "name": "Uncut emerald",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1605,
+     "name": "Emerald",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut ruby",
+   "level": 34,
+   "xp": 85.0,
+   "inputs": [
+    {
+     "id": 1619,
+     "name": "Uncut ruby",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1603,
+     "name": "Ruby",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut diamond",
+   "level": 43,
+   "xp": 107.5,
+   "inputs": [
+    {
+     "id": 1617,
+     "name": "Uncut diamond",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1601,
+     "name": "Diamond",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut dragonstone",
+   "level": 55,
+   "xp": 137.5,
+   "inputs": [
+    {
+     "id": 1631,
+     "name": "Uncut dragonstone",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1615,
+     "name": "Dragonstone",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut onyx",
+   "level": 67,
+   "xp": 167.5,
+   "inputs": [
+    {
+     "id": 6571,
+     "name": "Uncut onyx",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 6573,
+     "name": "Onyx",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Cut zenyte",
+   "level": 89,
+   "xp": 200.0,
+   "inputs": [
+    {
+     "id": 19496,
+     "name": "Uncut zenyte",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 19493,
+     "name": "Zenyte",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blow beer glass",
+   "level": 1,
+   "xp": 17.5,
+   "inputs": [
+    {
+     "id": 1775,
+     "name": "Molten glass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1919,
+     "name": "Beer glass",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blow empty candle lantern",
+   "level": 4,
+   "xp": 19.0,
+   "inputs": [
+    {
+     "id": 1775,
+     "name": "Molten glass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 4527,
+     "name": "Empty candle lantern",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blow oil lamp",
+   "level": 12,
+   "xp": 25.0,
+   "inputs": [
+    {
+     "id": 1775,
+     "name": "Molten glass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 4522,
+     "name": "Oil lamp",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blow vial",
+   "level": 33,
+   "xp": 35.0,
+   "inputs": [
+    {
+     "id": 1775,
+     "name": "Molten glass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 229,
+     "name": "Vial",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blow unpowered orb",
+   "level": 46,
+   "xp": 52.5,
+   "inputs": [
+    {
+     "id": 1775,
+     "name": "Molten glass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 567,
+     "name": "Unpowered orb",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blow lantern lens",
+   "level": 49,
+   "xp": 55.0,
+   "inputs": [
+    {
+     "id": 1775,
+     "name": "Molten glass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 4542,
+     "name": "Lantern lens",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Blow light orb",
+   "level": 87,
+   "xp": 70.0,
+   "inputs": [
+    {
+     "id": 1775,
+     "name": "Molten glass",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 10973,
+     "name": "Light orb",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Water battlestaff",
+   "level": 54,
+   "xp": 100.0,
+   "inputs": [
+    {
+     "id": 1391,
+     "name": "Battlestaff",
+     "qty": 1.0
+    },
+    {
+     "id": 571,
+     "name": "Water orb",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1395,
+     "name": "Water battlestaff",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Earth battlestaff",
+   "level": 58,
+   "xp": 112.5,
+   "inputs": [
+    {
+     "id": 1391,
+     "name": "Battlestaff",
+     "qty": 1.0
+    },
+    {
+     "id": 575,
+     "name": "Earth orb",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1399,
+     "name": "Earth battlestaff",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Fire battlestaff",
+   "level": 62,
+   "xp": 125.0,
+   "inputs": [
+    {
+     "id": 1391,
+     "name": "Battlestaff",
+     "qty": 1.0
+    },
+    {
+     "id": 569,
+     "name": "Fire orb",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1393,
+     "name": "Fire battlestaff",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Air battlestaff",
+   "level": 66,
+   "xp": 137.5,
+   "inputs": [
+    {
+     "id": 1391,
+     "name": "Battlestaff",
+     "qty": 1.0
+    },
+    {
+     "id": 573,
+     "name": "Air orb",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1397,
+     "name": "Air battlestaff",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Gold ring",
+   "level": 5,
+   "xp": 15.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1635,
+     "name": "Gold ring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Gold necklace",
+   "level": 6,
+   "xp": 20.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1654,
+     "name": "Gold necklace",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Gold bracelet",
+   "level": 7,
+   "xp": 25.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 11069,
+     "name": "Gold bracelet",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Gold amulet (u)",
+   "level": 8,
+   "xp": 30.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1673,
+     "name": "Gold amulet (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Sapphire ring",
+   "level": 20,
+   "xp": 40.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    },
+    {
+     "id": 1607,
+     "name": "Sapphire",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1637,
+     "name": "Sapphire ring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Emerald ring",
+   "level": 27,
+   "xp": 55.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    },
+    {
+     "id": 1605,
+     "name": "Emerald",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1639,
+     "name": "Emerald ring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Ruby ring",
+   "level": 34,
+   "xp": 70.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    },
+    {
+     "id": 1603,
+     "name": "Ruby",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1641,
+     "name": "Ruby ring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Diamond ring",
+   "level": 43,
+   "xp": 85.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    },
+    {
+     "id": 1601,
+     "name": "Diamond",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1643,
+     "name": "Diamond ring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Dragonstone ring",
+   "level": 55,
+   "xp": 100.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    },
+    {
+     "id": 1615,
+     "name": "Dragonstone",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1645,
+     "name": "Dragonstone ring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Onyx ring",
+   "level": 67,
+   "xp": 115.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    },
+    {
+     "id": 6573,
+     "name": "Onyx",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 6575,
+     "name": "Onyx ring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Zenyte ring",
+   "level": 89,
+   "xp": 150.0,
+   "inputs": [
+    {
+     "id": 2357,
+     "name": "Gold bar",
+     "qty": 1.0
+    },
+    {
+     "id": 19493,
+     "name": "Zenyte",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 19538,
+     "name": "Zenyte ring",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CRAFTING",
+   "name": "Make molten glass",
+   "level": 1,
+   "xp": 20.0,
+   "inputs": [
+    {
+     "id": 1783,
+     "name": "Bucket of sand",
+     "qty": 1.0
+    },
+    {
+     "id": 1781,
+     "name": "Soda ash",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 1775,
+     "name": "Molten glass",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn logs",
+   "level": 1,
+   "xp": 40.0,
+   "inputs": [
+    {
+     "id": 1511,
+     "name": "Logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn oak logs",
+   "level": 15,
+   "xp": 60.0,
+   "inputs": [
+    {
+     "id": 1521,
+     "name": "Oak logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn willow logs",
+   "level": 30,
+   "xp": 90.0,
+   "inputs": [
+    {
+     "id": 1519,
+     "name": "Willow logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn teak logs",
+   "level": 35,
+   "xp": 105.0,
+   "inputs": [
+    {
+     "id": 6333,
+     "name": "Teak logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn maple logs",
+   "level": 45,
+   "xp": 135.0,
+   "inputs": [
+    {
+     "id": 1517,
+     "name": "Maple logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn mahogany logs",
+   "level": 50,
+   "xp": 157.5,
+   "inputs": [
+    {
+     "id": 6332,
+     "name": "Mahogany logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn yew logs",
+   "level": 60,
+   "xp": 202.5,
+   "inputs": [
+    {
+     "id": 1515,
+     "name": "Yew logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn magic logs",
+   "level": 75,
+   "xp": 303.8,
+   "inputs": [
+    {
+     "id": 1513,
+     "name": "Magic logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FIREMAKING",
+   "name": "Burn redwood logs",
+   "level": 90,
+   "xp": 350.0,
+   "inputs": [
+    {
+     "id": 19669,
+     "name": "Redwood logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Curse",
+   "level": 19,
+   "xp": 29.0,
+   "inputs": [
+    {
+     "id": 559,
+     "name": "Body rune",
+     "qty": 1.0
+    },
+    {
+     "id": 555,
+     "name": "Water rune",
+     "qty": 3.0
+    },
+    {
+     "id": 557,
+     "name": "Earth rune",
+     "qty": 2.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Varrock Teleport",
+   "level": 25,
+   "xp": 35.0,
+   "inputs": [
+    {
+     "id": 563,
+     "name": "Law rune",
+     "qty": 1.0
+    },
+    {
+     "id": 556,
+     "name": "Air rune",
+     "qty": 3.0
+    },
+    {
+     "id": 554,
+     "name": "Fire rune",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Falador Teleport",
+   "level": 37,
+   "xp": 48.0,
+   "inputs": [
+    {
+     "id": 563,
+     "name": "Law rune",
+     "qty": 1.0
+    },
+    {
+     "id": 556,
+     "name": "Air rune",
+     "qty": 3.0
+    },
+    {
+     "id": 555,
+     "name": "Water rune",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Camelot Teleport",
+   "level": 45,
+   "xp": 55.5,
+   "inputs": [
+    {
+     "id": 563,
+     "name": "Law rune",
+     "qty": 1.0
+    },
+    {
+     "id": 556,
+     "name": "Air rune",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "High Level Alchemy - rune cost only",
+   "level": 55,
+   "xp": 65.0,
+   "inputs": [
+    {
+     "id": 561,
+     "name": "Nature rune",
+     "qty": 1.0
+    },
+    {
+     "id": 554,
+     "name": "Fire rune",
+     "qty": 5.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Ardougne Teleport",
+   "level": 51,
+   "xp": 61.0,
+   "inputs": [
+    {
+     "id": 563,
+     "name": "Law rune",
+     "qty": 2.0
+    },
+    {
+     "id": 555,
+     "name": "Water rune",
+     "qty": 2.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Watchtower Teleport",
+   "level": 58,
+   "xp": 68.0,
+   "inputs": [
+    {
+     "id": 563,
+     "name": "Law rune",
+     "qty": 2.0
+    },
+    {
+     "id": 557,
+     "name": "Earth rune",
+     "qty": 2.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Stun",
+   "level": 80,
+   "xp": 90.0,
+   "inputs": [
+    {
+     "id": 566,
+     "name": "Soul rune",
+     "qty": 1.0
+    },
+    {
+     "id": 559,
+     "name": "Body rune",
+     "qty": 12.0
+    },
+    {
+     "id": 555,
+     "name": "Water rune",
+     "qty": 12.0
+    },
+    {
+     "id": 557,
+     "name": "Earth rune",
+     "qty": 12.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "String Jewellery",
+   "level": 80,
+   "xp": 83.0,
+   "inputs": [
+    {
+     "id": 9075,
+     "name": "Astral rune",
+     "qty": 2.0
+    },
+    {
+     "id": 555,
+     "name": "Water rune",
+     "qty": 5.0
+    },
+    {
+     "id": 557,
+     "name": "Earth rune",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Plank Make - mahogany",
+   "level": 86,
+   "xp": 90.0,
+   "inputs": [
+    {
+     "id": 6332,
+     "name": "Mahogany logs",
+     "qty": 1.0
+    },
+    {
+     "id": 9075,
+     "name": "Astral rune",
+     "qty": 2.0
+    },
+    {
+     "id": 561,
+     "name": "Nature rune",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 8782,
+     "name": "Mahogany plank",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Superheat steel bar",
+   "level": 43,
+   "xp": 53.0,
+   "inputs": [
+    {
+     "id": 561,
+     "name": "Nature rune",
+     "qty": 1.0
+    },
+    {
+     "id": 440,
+     "name": "Iron ore",
+     "qty": 1.0
+    },
+    {
+     "id": 453,
+     "name": "Coal",
+     "qty": 2
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2353,
+     "name": "Steel bar",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Lvl-1 Enchant - sapphire ring",
+   "level": 7,
+   "xp": 17.5,
+   "inputs": [
+    {
+     "id": 564,
+     "name": "Cosmic rune",
+     "qty": 1.0
+    },
+    {
+     "id": 555,
+     "name": "Water rune",
+     "qty": 1.0
+    },
+    {
+     "id": 1637,
+     "name": "Sapphire ring",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2550,
+     "name": "Ring of recoil",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Lvl-2 Enchant - emerald ring",
+   "level": 27,
+   "xp": 37.0,
+   "inputs": [
+    {
+     "id": 564,
+     "name": "Cosmic rune",
+     "qty": 1.0
+    },
+    {
+     "id": 556,
+     "name": "Air rune",
+     "qty": 3
+    },
+    {
+     "id": 1639,
+     "name": "Emerald ring",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2552,
+     "name": "Ring of duelling(8)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Lvl-3 Enchant - ruby ring",
+   "level": 49,
+   "xp": 59.0,
+   "inputs": [
+    {
+     "id": 564,
+     "name": "Cosmic rune",
+     "qty": 1.0
+    },
+    {
+     "id": 554,
+     "name": "Fire rune",
+     "qty": 5
+    },
+    {
+     "id": 1641,
+     "name": "Ruby ring",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2568,
+     "name": "Ring of forging",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Lvl-4 Enchant - diamond ring",
+   "level": 57,
+   "xp": 67.0,
+   "inputs": [
+    {
+     "id": 564,
+     "name": "Cosmic rune",
+     "qty": 1.0
+    },
+    {
+     "id": 557,
+     "name": "Earth rune",
+     "qty": 10
+    },
+    {
+     "id": 1643,
+     "name": "Diamond ring",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2570,
+     "name": "Ring of life",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "MAGIC",
+   "name": "Lvl-5 Enchant - dragonstone ring",
+   "level": 68,
+   "xp": 78.0,
+   "inputs": [
+    {
+     "id": 564,
+     "name": "Cosmic rune",
+     "qty": 1.0
+    },
+    {
+     "id": 555,
+     "name": "Water rune",
+     "qty": 15
+    },
+    {
+     "id": 557,
+     "name": "Earth rune",
+     "qty": 15
+    },
+    {
+     "id": 1645,
+     "name": "Dragonstone ring",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 2572,
+     "name": "Ring of wealth",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Arrow shafts from logs",
+   "level": 1,
+   "xp": 5.0,
+   "inputs": [
+    {
+     "id": 1511,
+     "name": "Logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 52,
+     "name": "Arrow shaft",
+     "qty": 15.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Headless arrows",
+   "level": 1,
+   "xp": 15.0,
+   "inputs": [
+    {
+     "id": 52,
+     "name": "Arrow shaft",
+     "qty": 15.0
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 15.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 53,
+     "name": "Headless arrow",
+     "qty": 15.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Broad arrows",
+   "level": 52,
+   "xp": 150.0,
+   "inputs": [
+    {
+     "id": 53,
+     "name": "Headless arrow",
+     "qty": 15.0
+    },
+    {
+     "id": 11874,
+     "name": "Broad arrowheads",
+     "qty": 15.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 4160,
+     "name": "Broad arrows",
+     "qty": 15.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut shortbow (u)",
+   "level": 5,
+   "xp": 5.0,
+   "inputs": [
+    {
+     "id": 1511,
+     "name": "Logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 50,
+     "name": "Shortbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String shortbow",
+   "level": 5,
+   "xp": 5.0,
+   "inputs": [
+    {
+     "id": 50,
+     "name": "Shortbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 841,
+     "name": "Shortbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut longbow (u)",
+   "level": 10,
+   "xp": 10.0,
+   "inputs": [
+    {
+     "id": 1511,
+     "name": "Logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 48,
+     "name": "Longbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String longbow",
+   "level": 10,
+   "xp": 10.0,
+   "inputs": [
+    {
+     "id": 48,
+     "name": "Longbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 839,
+     "name": "Longbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut oak shortbow (u)",
+   "level": 20,
+   "xp": 16.5,
+   "inputs": [
+    {
+     "id": 1521,
+     "name": "Oak logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 54,
+     "name": "Oak shortbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String oak shortbow",
+   "level": 20,
+   "xp": 16.5,
+   "inputs": [
+    {
+     "id": 54,
+     "name": "Oak shortbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 843,
+     "name": "Oak shortbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut oak longbow (u)",
+   "level": 25,
+   "xp": 25.0,
+   "inputs": [
+    {
+     "id": 1521,
+     "name": "Oak logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 56,
+     "name": "Oak longbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String oak longbow",
+   "level": 25,
+   "xp": 25.0,
+   "inputs": [
+    {
+     "id": 56,
+     "name": "Oak longbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 845,
+     "name": "Oak longbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut willow shortbow (u)",
+   "level": 35,
+   "xp": 33.3,
+   "inputs": [
+    {
+     "id": 1519,
+     "name": "Willow logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 60,
+     "name": "Willow shortbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String willow shortbow",
+   "level": 35,
+   "xp": 33.3,
+   "inputs": [
+    {
+     "id": 60,
+     "name": "Willow shortbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 849,
+     "name": "Willow shortbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut willow longbow (u)",
+   "level": 40,
+   "xp": 41.5,
+   "inputs": [
+    {
+     "id": 1519,
+     "name": "Willow logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 58,
+     "name": "Willow longbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String willow longbow",
+   "level": 40,
+   "xp": 41.5,
+   "inputs": [
+    {
+     "id": 58,
+     "name": "Willow longbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 847,
+     "name": "Willow longbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut maple shortbow (u)",
+   "level": 50,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 1517,
+     "name": "Maple logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 64,
+     "name": "Maple shortbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String maple shortbow",
+   "level": 50,
+   "xp": 50.0,
+   "inputs": [
+    {
+     "id": 64,
+     "name": "Maple shortbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 853,
+     "name": "Maple shortbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut maple longbow (u)",
+   "level": 55,
+   "xp": 58.3,
+   "inputs": [
+    {
+     "id": 1517,
+     "name": "Maple logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 62,
+     "name": "Maple longbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String maple longbow",
+   "level": 55,
+   "xp": 58.3,
+   "inputs": [
+    {
+     "id": 62,
+     "name": "Maple longbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 851,
+     "name": "Maple longbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut yew shortbow (u)",
+   "level": 65,
+   "xp": 67.5,
+   "inputs": [
+    {
+     "id": 1515,
+     "name": "Yew logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 68,
+     "name": "Yew shortbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String yew shortbow",
+   "level": 65,
+   "xp": 67.5,
+   "inputs": [
+    {
+     "id": 68,
+     "name": "Yew shortbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 857,
+     "name": "Yew shortbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut yew longbow (u)",
+   "level": 70,
+   "xp": 75.0,
+   "inputs": [
+    {
+     "id": 1515,
+     "name": "Yew logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 66,
+     "name": "Yew longbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String yew longbow",
+   "level": 70,
+   "xp": 75.0,
+   "inputs": [
+    {
+     "id": 66,
+     "name": "Yew longbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 855,
+     "name": "Yew longbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut magic shortbow (u)",
+   "level": 80,
+   "xp": 83.3,
+   "inputs": [
+    {
+     "id": 1513,
+     "name": "Magic logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 72,
+     "name": "Magic shortbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String magic shortbow",
+   "level": 80,
+   "xp": 83.3,
+   "inputs": [
+    {
+     "id": 72,
+     "name": "Magic shortbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 861,
+     "name": "Magic shortbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Cut magic longbow (u)",
+   "level": 85,
+   "xp": 91.5,
+   "inputs": [
+    {
+     "id": 1513,
+     "name": "Magic logs",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 70,
+     "name": "Magic longbow (u)",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "String magic longbow",
+   "level": 85,
+   "xp": 91.5,
+   "inputs": [
+    {
+     "id": 70,
+     "name": "Magic longbow (u)",
+     "qty": 1.0
+    },
+    {
+     "id": 1777,
+     "name": "Bow string",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 859,
+     "name": "Magic longbow",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Bronze darts",
+   "level": 10,
+   "xp": 18.0,
+   "inputs": [
+    {
+     "id": 819,
+     "name": "Bronze dart tip",
+     "qty": 10.0
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 806,
+     "name": "Bronze dart",
+     "qty": 10.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Iron darts",
+   "level": 22,
+   "xp": 38.0,
+   "inputs": [
+    {
+     "id": 820,
+     "name": "Iron dart tip",
+     "qty": 10.0
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 807,
+     "name": "Iron dart",
+     "qty": 10.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Steel darts",
+   "level": 37,
+   "xp": 75.0,
+   "inputs": [
+    {
+     "id": 821,
+     "name": "Steel dart tip",
+     "qty": 10.0
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 808,
+     "name": "Steel dart",
+     "qty": 10.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Mithril darts",
+   "level": 52,
+   "xp": 112.0,
+   "inputs": [
+    {
+     "id": 822,
+     "name": "Mithril dart tip",
+     "qty": 10.0
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 809,
+     "name": "Mithril dart",
+     "qty": 10.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Adamant darts",
+   "level": 67,
+   "xp": 150.0,
+   "inputs": [
+    {
+     "id": 823,
+     "name": "Adamant dart tip",
+     "qty": 10.0
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 810,
+     "name": "Adamant dart",
+     "qty": 10.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Rune darts",
+   "level": 81,
+   "xp": 188.0,
+   "inputs": [
+    {
+     "id": 824,
+     "name": "Rune dart tip",
+     "qty": 10.0
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 811,
+     "name": "Rune dart",
+     "qty": 10.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Dragon darts",
+   "level": 95,
+   "xp": 250.0,
+   "inputs": [
+    {
+     "id": 11232,
+     "name": "Dragon dart tip",
+     "qty": 10.0
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 11230,
+     "name": "Dragon dart",
+     "qty": 10.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "FLETCHING",
+   "name": "Broad bolts",
+   "level": 55,
+   "xp": 30.0,
+   "inputs": [
+    {
+     "id": 11876,
+     "name": "Unfinished broad bolts",
+     "qty": 10
+    },
+    {
+     "id": 314,
+     "name": "Feather",
+     "qty": 10
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 11875,
+     "name": "Broad bolts",
+     "qty": 10
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft air rune",
+   "level": 1,
+   "xp": 5.0,
+   "inputs": [
+    {
+     "id": 1436,
+     "name": "Rune essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 556,
+     "name": "Air rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft mind rune",
+   "level": 2,
+   "xp": 5.5,
+   "inputs": [
+    {
+     "id": 1436,
+     "name": "Rune essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 558,
+     "name": "Mind rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft water rune",
+   "level": 5,
+   "xp": 6.0,
+   "inputs": [
+    {
+     "id": 1436,
+     "name": "Rune essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 555,
+     "name": "Water rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft earth rune",
+   "level": 9,
+   "xp": 6.5,
+   "inputs": [
+    {
+     "id": 1436,
+     "name": "Rune essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 557,
+     "name": "Earth rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft fire rune",
+   "level": 14,
+   "xp": 7.0,
+   "inputs": [
+    {
+     "id": 1436,
+     "name": "Rune essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 554,
+     "name": "Fire rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft body rune",
+   "level": 20,
+   "xp": 7.5,
+   "inputs": [
+    {
+     "id": 1436,
+     "name": "Rune essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 559,
+     "name": "Body rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft cosmic rune",
+   "level": 27,
+   "xp": 8.0,
+   "inputs": [
+    {
+     "id": 7936,
+     "name": "Pure essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 564,
+     "name": "Cosmic rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft chaos rune",
+   "level": 35,
+   "xp": 8.5,
+   "inputs": [
+    {
+     "id": 7936,
+     "name": "Pure essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 562,
+     "name": "Chaos rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft nature rune",
+   "level": 44,
+   "xp": 9.0,
+   "inputs": [
+    {
+     "id": 7936,
+     "name": "Pure essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 561,
+     "name": "Nature rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft law rune",
+   "level": 54,
+   "xp": 9.5,
+   "inputs": [
+    {
+     "id": 7936,
+     "name": "Pure essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 563,
+     "name": "Law rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft death rune",
+   "level": 65,
+   "xp": 10.0,
+   "inputs": [
+    {
+     "id": 7936,
+     "name": "Pure essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 560,
+     "name": "Death rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft blood rune",
+   "level": 77,
+   "xp": 23.8,
+   "inputs": [
+    {
+     "id": 7936,
+     "name": "Pure essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 565,
+     "name": "Blood rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft soul rune",
+   "level": 90,
+   "xp": 29.7,
+   "inputs": [
+    {
+     "id": 7936,
+     "name": "Pure essence",
+     "qty": 1.0
+    }
+   ],
+   "optional": [],
+   "outputs": [
+    {
+     "id": 566,
+     "name": "Soul rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "RUNECRAFT",
+   "name": "Craft lava rune",
+   "level": 23,
+   "xp": 10.5,
+   "inputs": [
+    {
+     "id": 7936,
+     "name": "Pure essence",
+     "qty": 1.0
+    },
+    {
+     "id": 1440,
+     "name": "Earth talisman",
+     "qty": 1.0
+    }
+   ],
+   "optional": [
+    {
+     "id": 5521,
+     "name": "Binding necklace",
+     "qty": 0.0625
+    }
+   ],
+   "outputs": [
+    {
+     "id": 4699,
+     "name": "Lava rune",
+     "qty": 1.0
+    }
+   ],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Crude wooden chair",
+   "level": 1,
+   "xp": 58.0,
+   "inputs": [
+    {
+     "id": 960,
+     "name": "Plank",
+     "qty": 2.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Wooden bookcase",
+   "level": 4,
+   "xp": 115.0,
+   "inputs": [
+    {
+     "id": 960,
+     "name": "Plank",
+     "qty": 4.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Oak chair",
+   "level": 19,
+   "xp": 120.0,
+   "inputs": [
+    {
+     "id": 8778,
+     "name": "Oak plank",
+     "qty": 2.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Oak armchair",
+   "level": 26,
+   "xp": 180.0,
+   "inputs": [
+    {
+     "id": 8778,
+     "name": "Oak plank",
+     "qty": 3.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Oak larder",
+   "level": 33,
+   "xp": 480.0,
+   "inputs": [
+    {
+     "id": 8778,
+     "name": "Oak plank",
+     "qty": 8.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Mahogany table",
+   "level": 52,
+   "xp": 840.0,
+   "inputs": [
+    {
+     "id": 8782,
+     "name": "Mahogany plank",
+     "qty": 6.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Teak garden bench",
+   "level": 66,
+   "xp": 540.0,
+   "inputs": [
+    {
+     "id": 8780,
+     "name": "Teak plank",
+     "qty": 6.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Oak dungeon door",
+   "level": 74,
+   "xp": 600.0,
+   "inputs": [
+    {
+     "id": 8778,
+     "name": "Oak plank",
+     "qty": 10.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  },
+  {
+   "skill": "CONSTRUCTION",
+   "name": "Gnome bench",
+   "level": 77,
+   "xp": 840.0,
+   "inputs": [
+    {
+     "id": 8782,
+     "name": "Mahogany plank",
+     "qty": 6.0
+    }
+   ],
+   "optional": [],
+   "outputs": [],
+   "group": null,
+   "variant": null
+  }
+ ],
+ "prayer": {
+  "libationMinLevel": 30,
+  "libationFeeGp": 10,
+  "jugOfWine": {
+   "id": 1993,
+   "name": "Jug of wine"
+  },
+  "sunfireSplinters": {
+   "id": 28924,
+   "name": "Sunfire splinters"
+  },
+  "bucketOfSlime": {
+   "id": 4286,
+   "name": "Bucket of slime"
+  },
+  "bones": [
+   {
+    "id": 526,
+    "name": "Bones",
+    "level": 1,
+    "buryXp": 4.5,
+    "shards": 4
+   },
+   {
+    "id": 532,
+    "name": "Big bones",
+    "level": 1,
+    "buryXp": 15.0,
+    "shards": 12
+   },
+   {
+    "id": 534,
+    "name": "Babydragon bones",
+    "level": 1,
+    "buryXp": 30.0,
+    "shards": 24
+   },
+   {
+    "id": 536,
+    "name": "Dragon bones",
+    "level": 1,
+    "buryXp": 72.0,
+    "shards": 58
+   },
+   {
+    "id": 6812,
+    "name": "Wyvern bones",
+    "level": 1,
+    "buryXp": 72.0,
+    "shards": 58
+   },
+   {
+    "id": 4830,
+    "name": "Fayrg bones",
+    "level": 1,
+    "buryXp": 84.0,
+    "shards": 67
+   },
+   {
+    "id": 31729,
+    "name": "Frost dragon bones",
+    "level": 1,
+    "buryXp": 100.0,
+    "shards": 84
+   },
+   {
+    "id": 22786,
+    "name": "Hydra bones",
+    "level": 1,
+    "buryXp": 110.0,
+    "shards": 93
+   },
+   {
+    "id": 6729,
+    "name": "Dagannoth bones",
+    "level": 1,
+    "buryXp": 125.0,
+    "shards": 100
+   },
+   {
+    "id": 22124,
+    "name": "Superior dragon bones",
+    "level": 70,
+    "buryXp": 150.0,
+    "shards": 121
+   }
+  ],
+  "ashes": [
+   {
+    "id": 25766,
+    "name": "Vile ashes",
+    "level": 1,
+    "scatterXp": 25.0
+   },
+   {
+    "id": 25769,
+    "name": "Malicious ashes",
+    "level": 1,
+    "scatterXp": 65.0
+   },
+   {
+    "id": 25775,
+    "name": "Abyssal ashes",
+    "level": 1,
+    "scatterXp": 85.0
+   },
+   {
+    "id": 25772,
+    "name": "Infernal ashes",
+    "level": 1,
+    "scatterXp": 110.0
+   }
+  ]
+ }
+}
