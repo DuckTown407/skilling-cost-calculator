@@ -1,17 +1,75 @@
-# Gradle
+# Build output and local tooling
 .gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
+.tooling/
+out/
+/bin/
+*.class
+*.jar
+*.war
+*.ear
+!/gradle/wrapper/gradle-wrapper.jar
 
-# IntelliJ IDEA
+# IDE settings
 .idea/
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
 *.iml
 *.ipr
 *.iws
-out/
 
-# macOS
+# Local agent instructions and generated skills
+/AGENTS.md
+/CLAUDE.md
+/.agents/skills/
+
+# Python tooling and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Locally installed tooling
+node_modules/
+.cache/
+
+# Temporary and editor backup files
+.tmp/
+.temp/
+/tmp/
+/temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Local environment and development-client data
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.sample
+!.env.template
+/.runelite/
+
+# Operating system metadata
 .DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Logs
+# Logs and JVM diagnostics
+logs/
 *.log
+hs_err_pid*
+replay_pid*
+*.hprof
+*.jfr
