@@ -26,6 +26,9 @@ out/
 /CLAUDE.md
 /.agents/skills/
 
+# Local OpenSpec planning
+/openspec/
+
 # Python tooling and caches
 __pycache__/
 *.py[cod]
