@@ -2,14 +2,19 @@ package com.skillingcost;
 
 import com.google.gson.Gson;
 import java.io.IOException;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -17,167 +22,225 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+@Slf4j
 @Singleton
 final class PriceService
 {
     private static final String LATEST_URL = "https://prices.runescape.wiki/api/v1/osrs/latest";
     private static final Duration CACHE_DURATION = Duration.ofSeconds(60);
 
-    private final OkHttpClient okHttpClient;
+    private final Call.Factory calls;
     private final Gson gson;
     private final SkillingCostConfig config;
+    private final Clock clock;
     private final Object lock = new Object();
+    private final List<WaitingConsumer> waiting = new ArrayList<>();
 
-    private Map<Integer, WikiPrice> cache = new HashMap<>();
-    private Instant cacheTime = Instant.EPOCH;
+    private PriceSnapshot cache;
     private Call activeCall;
+    private long generation;
 
     @Inject
-    PriceService(OkHttpClient okHttpClient, Gson gson, SkillingCostConfig config)
+    PriceService(OkHttpClient client, Gson gson, SkillingCostConfig config)
     {
-        this.okHttpClient = okHttpClient;
-        this.gson = gson;
-        this.config = config;
+        this(client, gson, config, Clock.systemUTC());
     }
 
-    void getLatestPrices(Set<Integer> requiredItemIds, Consumer<Map<Integer, WikiPrice>> onSuccess, Consumer<String> onError)
+    PriceService(Call.Factory calls, Gson gson, SkillingCostConfig config, Clock clock)
     {
-        if (requiredItemIds.isEmpty())
+        this.calls = calls;
+        this.gson = gson;
+        this.config = config;
+        this.clock = clock;
+    }
+
+    void getLatestSnapshot(Set<Integer> ids, boolean refresh, Consumer<PriceSnapshot> success, Consumer<String> error)
+    {
+        if (ids.isEmpty())
         {
-            onSuccess.accept(new HashMap<>());
+            success.accept(new PriceSnapshot(Collections.emptyMap(), Instant.EPOCH));
             return;
         }
-
+        if (!config.enableWikiPrices())
+        {
+            error.accept("Enable Wiki prices in plugin config to price GE resources.");
+            return;
+        }
+        WaitingConsumer consumer = new WaitingConsumer(ids, success, error);
+        PriceSnapshot cached = null;
+        Call started = null;
+        long requestGeneration;
         synchronized (lock)
         {
-            if (isCacheUsable(requiredItemIds))
+            requestGeneration = generation;
+            Duration age = cache == null ? CACHE_DURATION : Duration.between(cache.fetchedAt, clock.instant());
+            if (!refresh && cache != null && !age.isNegative() && age.compareTo(CACHE_DURATION) < 0)
             {
-                onSuccess.accept(copyRequiredPrices(requiredItemIds));
-                return;
+                cached = subset(cache, ids);
             }
-        }
-
-        Request request = new Request.Builder()
-            .url(LATEST_URL)
-            .header("User-Agent", wikiUserAgent())
-            .build();
-
-        Call call = okHttpClient.newCall(request);
-        synchronized (lock)
-        {
-            activeCall = call;
-        }
-
-        call.enqueue(new Callback()
-        {
-            @Override
-            public void onFailure(Call call, IOException e)
+            else
             {
-                if (!call.isCanceled())
+                waiting.add(consumer);
+                if (activeCall == null)
                 {
-                    onError.accept("Price fetch failed: " + e.getMessage());
+                    try
+                    {
+                        activeCall = calls.newCall(new Request.Builder().url(LATEST_URL)
+                            .header("User-Agent", wikiUserAgent()).build());
+                        started = activeCall;
+                    }
+                    catch (RuntimeException e)
+                    {
+                        waiting.remove(consumer);
+                        log.debug("Cannot prepare price request", e);
+                    }
                 }
             }
+        }
+        if (cached != null)
+        {
+            if (isCurrent(requestGeneration)) { success.accept(cached); }
+            return;
+        }
+        if (started == null)
+        {
+            synchronized (lock)
+            {
+                if (activeCall != null || generation != requestGeneration) { return; }
+            }
+            error.accept("Unable to prepare price request. Check the Wiki User-Agent setting.");
+            return;
+        }
+        final long token = requestGeneration;
+        final Call call = started;
+        Callback callback = new Callback()
+        {
+            @Override
+            public void onFailure(Call failed, IOException exception)
+            {
+                log.debug("Price acquisition failed", exception);
+                complete(call, token, null, "Could not reach Wiki prices. Try refreshing.");
+            }
 
             @Override
-            public void onResponse(Call call, Response response)
+            public void onResponse(Call responded, Response response)
             {
+                PriceSnapshot snapshot = null;
+                String failure = null;
                 try (Response ignored = response)
                 {
                     if (!response.isSuccessful())
                     {
-                        onError.accept("Price fetch failed: HTTP " + response.code());
-                        return;
+                        failure = "Wiki price request failed (HTTP " + response.code() + ").";
                     }
-
-                    ResponseBody body = response.body();
-                    if (body == null)
+                    else
                     {
-                        onError.accept("Price fetch failed: empty response");
-                        return;
-                    }
-
-                    WikiLatestResponse latest = gson.fromJson(body.string(), WikiLatestResponse.class);
-                    if (latest == null || latest.data == null)
-                    {
-                        onError.accept("Price fetch failed: invalid response");
-                        return;
-                    }
-
-                    Map<Integer, WikiPrice> parsed = new HashMap<>();
-                    for (Map.Entry<String, WikiPrice> entry : latest.data.entrySet())
-                    {
-                        try
+                        ResponseBody body = response.body();
+                        if (body == null)
                         {
-                            parsed.put(Integer.parseInt(entry.getKey()), entry.getValue());
+                            failure = "Wiki prices returned an empty response.";
                         }
-                        catch (NumberFormatException ignoredKey)
+                        else
                         {
-                            // Ignore malformed API keys.
+                            snapshot = new PriceSnapshot(WikiLatestResponse.parse(gson, body.string()), clock.instant());
                         }
                     }
-
-                    synchronized (lock)
-                    {
-                        cache = parsed;
-                        cacheTime = Instant.now();
-                        activeCall = null;
-                    }
-
-                    Map<Integer, WikiPrice> required = copyRequiredPrices(requiredItemIds);
-                    onSuccess.accept(required);
                 }
-                catch (Exception e)
+                catch (IOException | RuntimeException exception)
                 {
-                    onError.accept("Price fetch failed: " + e.getMessage());
+                    log.debug("Cannot read Wiki price response", exception);
+                    failure = "Wiki prices returned an unreadable response. Try refreshing.";
                 }
+                complete(call, token, snapshot, failure);
             }
-        });
+        };
+        try
+        {
+            call.enqueue(callback);
+        }
+        catch (RuntimeException exception)
+        {
+            log.debug("Cannot queue price request", exception);
+            complete(call, token, null, "Unable to start the Wiki price request. Try refreshing.");
+        }
+    }
+
+    private void complete(Call call, long token, PriceSnapshot snapshot, String error)
+    {
+        List<WaitingConsumer> consumers;
+        synchronized (lock)
+        {
+            if (activeCall != call || generation != token) { return; }
+            activeCall = null;
+            consumers = new ArrayList<>(waiting);
+            waiting.clear();
+            if (snapshot != null) { cache = snapshot; }
+        }
+        for (WaitingConsumer consumer : consumers)
+        {
+            if (!isCurrent(token)) { return; }
+            try
+            {
+                if (snapshot != null) { consumer.success.accept(subset(snapshot, consumer.ids)); }
+                else { consumer.error.accept(error); }
+            }
+            catch (RuntimeException exception)
+            {
+                log.debug("Price consumer failed", exception);
+            }
+        }
     }
 
     void cancel()
     {
+        Call cancel;
         synchronized (lock)
         {
-            if (activeCall != null)
-            {
-                activeCall.cancel();
-                activeCall = null;
-            }
+            generation++;
+            cancel = activeCall;
+            activeCall = null;
+            waiting.clear();
+            cache = null;
         }
+        if (cancel != null) { cancel.cancel(); }
+    }
+
+    private boolean isCurrent(long token)
+    {
+        synchronized (lock)
+        {
+            return generation == token && config.enableWikiPrices();
+        }
+    }
+
+    private static PriceSnapshot subset(PriceSnapshot snapshot, Set<Integer> ids)
+    {
+        Map<Integer, WikiPrice> prices = new HashMap<>();
+        for (Integer id : ids)
+        {
+            WikiPrice quote = snapshot.prices.get(id);
+            if (quote != null) { prices.put(id, quote); }
+        }
+        return new PriceSnapshot(prices, snapshot.fetchedAt);
     }
 
     private String wikiUserAgent()
     {
-        String userAgent = config.wikiUserAgent();
-        if (userAgent == null || userAgent.trim().isEmpty())
-        {
-            return "skilling-cost-calculator RuneLite plugin";
-        }
-        return userAgent.trim();
+        String agent = config.wikiUserAgent();
+        return agent == null || agent.trim().isEmpty() ? "skilling-cost-calculator RuneLite plugin" : agent.trim();
     }
 
-    private boolean isCacheUsable(Set<Integer> requiredItemIds)
+    private static final class WaitingConsumer
     {
-        return !cache.isEmpty()
-            && Duration.between(cacheTime, Instant.now()).compareTo(CACHE_DURATION) < 0
-            && cache.keySet().containsAll(requiredItemIds);
-    }
+        final Set<Integer> ids;
+        final Consumer<PriceSnapshot> success;
+        final Consumer<String> error;
 
-    private Map<Integer, WikiPrice> copyRequiredPrices(Set<Integer> requiredItemIds)
-    {
-        synchronized (lock)
+        WaitingConsumer(Set<Integer> ids, Consumer<PriceSnapshot> success, Consumer<String> error)
         {
-            Map<Integer, WikiPrice> out = new HashMap<>();
-            for (Integer itemId : requiredItemIds)
-            {
-                WikiPrice price = cache.get(itemId);
-                if (price != null)
-                {
-                    out.put(itemId, price);
-                }
-            }
-            return out;
+            this.ids = Collections.unmodifiableSet(new java.util.LinkedHashSet<>(ids));
+            this.success = success;
+            this.error = error;
         }
     }
 }

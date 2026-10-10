@@ -4,14 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,894 +20,564 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import net.runelite.api.Experience;
 import net.runelite.api.Skill;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
-/**
- * The plugin side panel. Layout, top to bottom:
- * skill picker -> current/target level+XP spinners -> sort picker and lock filter ->
- * method list (one row per method or method group) -> variant dropdown (only for groups) ->
- * option checkboxes -> calculate button -> scrollable result area ({@link ResultRenderer}).
- *
- * Level and XP spinners are kept in sync both ways; the {@code syncingFields} flag prevents
- * the change listeners from feeding back into each other.
- */
+/** All mutable session state and completion checks belong to the Swing EDT. */
 final class SkillingCostPanel extends PluginPanel
 {
-    private static final int MAX_SKILL_LEVEL = 99;
-    private static final int MAX_XP = 200_000_000;
-    private static final int DEFAULT_TARGET_LEVEL = 2;
-
     static final Color TEXT = new Color(220, 220, 220);
     static final Color SUBTEXT = new Color(170, 170, 170);
     static final Color PROFIT = new Color(0, 180, 75);
     static final Color LOSS = new Color(190, 55, 55);
 
-    private final SkillingCostPlugin plugin;
-    private final Map<Skill, List<SkillingMethod>> methodsBySkill;
-
-    private final JComboBox<Skill> skillSelect;
-    private final JComboBox<MethodSort> sortSelect = new JComboBox<>(MethodSort.values());
-    private final DefaultListModel<MethodListEntry> entryListModel = new DefaultListModel<>();
-    private final JList<MethodListEntry> entryList = new JList<>(entryListModel);
-    private final List<MethodListEntry> currentEntries = new ArrayList<>();
-    private final Map<SkillingMethod, Long> netEstimates = new HashMap<>();
-    private final JComboBox<SkillingMethod> variantSelect = new JComboBox<>();
-    private final JPanel variantRow;
-    private final JSpinner currentLevel = new JSpinner(new SpinnerNumberModel(1, 1, MAX_SKILL_LEVEL, 1));
-    private final JSpinner currentXp = new JSpinner(new SpinnerNumberModel(0, 0, MAX_XP, 1));
-    private final JSpinner targetLevel = new JSpinner(new SpinnerNumberModel(DEFAULT_TARGET_LEVEL, 1, MAX_SKILL_LEVEL, 1));
-    private final JSpinner targetXp = new JSpinner(new SpinnerNumberModel(Experience.getXpForLevel(DEFAULT_TARGET_LEVEL), 0, MAX_XP, 1));
-    private final JButton loadCurrentXpButton = new JButton("Load current XP");
-    private final JCheckBox hideLockedMethods = new JCheckBox("Hide locked methods", false);
-    private final JCheckBox includeOptionalInputs = new JCheckBox("Include optional consumables", true);
-    private final JCheckBox sellOutputs = new JCheckBox("Sell outputs", true);
-    private final JCheckBox includeTax = new JCheckBox("Include GE tax", true);
-    private final JButton calculateButton = new JButton("Calculate selected method");
-    private final ResultRenderer resultRenderer = new ResultRenderer();
-
-    private boolean syncingFields;
-    private boolean updatingSelection;
-    private boolean updatingVariants;
-    private int xpLoadRequestId;
-    private int netSortRequestId;
-
-    private enum MethodSort
+    enum MethodSort
     {
-        LEAST_ACTIONS("Least actions"),
-        MOST_PROFITABLE("Most profitable");
-
+        LEAST_ACTIONS("Least actions"), MOST_PROFITABLE("Most profitable");
         private final String label;
+        MethodSort(String label) { this.label = label; }
+        @Override public String toString() { return label; }
+    }
 
-        MethodSort(String label)
+    private final CalculatorController controller;
+    private final Map<Skill, List<SkillingMethod>> methods;
+    final CalculatorSession session = new CalculatorSession();
+    final JComboBox<Skill> skillSelect;
+    final JComboBox<MethodSort> sortSelect = new JComboBox<>(MethodSort.values());
+    final JTextField search = new JTextField();
+    final JCheckBox hideLocked = new JCheckBox("Hide locked methods");
+    final JSpinner currentLevel = spinner(1, 1, 99);
+    final JSpinner currentXp = spinner(0, 0, CalculatorSession.MAX_XP);
+    final JSpinner targetLevel = spinner(2, 1, 99);
+    final JSpinner targetXp = spinner(Experience.getXpForLevel(2), 0, CalculatorSession.MAX_XP);
+    final JSpinner batchSize = spinner(28, 1, 1000);
+    final JCheckBox optional = new JCheckBox("<html>Include optional<br>consumables</html>", true);
+    final JCheckBox sell = new JCheckBox("Sell outputs", true);
+    final JCheckBox tax = new JCheckBox("Include GE tax", true);
+    final JButton loadXp = new JButton("Load current XP");
+    final JButton refresh = new JButton("Refresh prices");
+    static final class MethodListModel extends DefaultListModel<MethodListEntry>
+    {
+        void widthChanged()
         {
-            this.label = label;
+            if (!isEmpty()) { fireContentsChanged(this, 0, size() - 1); }
         }
+    }
+
+    final MethodListModel rows = new MethodListModel();
+    final JList<MethodListEntry> list = new JList<MethodListEntry>(rows)
+    {
+        @Override
+        public boolean getScrollableTracksViewportWidth() { return true; }
 
         @Override
-        public String toString()
+        public void setBounds(int x, int y, int width, int height)
         {
-            return label;
+            boolean widthChanged = width != getWidth();
+            super.setBounds(x, y, width, height);
+            // Wrapped cell heights must be measured again after the viewport width changes.
+            if (widthChanged) { rows.widthChanged(); }
         }
+    };
+    private final JPanel rowRenderer = new JPanel(new BorderLayout(0, 4))
+    {
+        @Override
+        public Dimension getPreferredSize()
+        {
+            Dimension size = super.getPreferredSize();
+            size.height = Math.max(64, size.height);
+            return size;
+        }
+    };
+    private final javax.swing.JTextArea rowName = rowText();
+    private final javax.swing.JTextArea rowDescription = rowText();
+    final JComboBox<SkillingMethod> variants = new JComboBox<>();
+    final ResultRenderer renderer = new ResultRenderer();
+    private final JLabel empty = new JLabel("No matching methods.");
+    private final JLabel ranking = new JLabel("<html>Rows rank their selected<br>variant.</html>");
+    private final JPanel variantRow;
+    private final JPanel batchRow;
+    private final EstimateScheduler scheduler;
+    private Map<String, CostResult> estimates = Collections.emptyMap();
+    private Skill skill;
+    private boolean syncing;
+    private boolean disposed;
+    private boolean validInputs = true;
+    private long revision;
+    private long xpLoadRevision;
+
+    SkillingCostPanel(CalculatorController controller, MethodRepository repository)
+    {
+        this(controller, repository, EstimateScheduler::swing);
     }
 
-    SkillingCostPanel(SkillingCostPlugin plugin, MethodRepository methodRepository)
+    SkillingCostPanel(CalculatorController controller, MethodRepository repository,
+        Function<Runnable, EstimateScheduler> scheduling)
     {
         super(false);
-        this.plugin = plugin;
-        this.methodsBySkill = methodRepository.getMethodsBySkill();
-        this.skillSelect = new JComboBox<>(methodRepository.getSupportedSkills().toArray(new Skill[0]));
-
+        this.controller = controller;
+        methods = repository.getMethodsBySkill();
+        skillSelect = new JComboBox<>(repository.getSupportedSkills().toArray(new Skill[0]));
+        javax.swing.DefaultListCellRenderer skillsRenderer = new javax.swing.DefaultListCellRenderer();
+        skillSelect.setRenderer((view, value, index, selected, focus) ->
+            skillsRenderer.getListCellRendererComponent(view, value == null ? "" : Formats.skillName(value), index, selected, focus));
+        javax.swing.DefaultListCellRenderer variantsRenderer = new javax.swing.DefaultListCellRenderer();
+        variants.setRenderer((view, value, index, selected, focus) -> {
+            String name = value == null ? "" : value.getVariantName() == null ? value.getName() : value.getVariantName();
+            Component component = variantsRenderer.getListCellRendererComponent(view, name, index, selected, focus);
+            ((JLabel) component).setToolTipText(value == null ? null : value.getName());
+            return component;
+        });
+        scheduler = scheduling.apply(() -> estimate(false));
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JPanel content = new JPanel();
+        JPanel content = new ScrollablePanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
-
-        configureSkillRenderer();
-        skillSelect.setAlignmentX(Component.LEFT_ALIGNMENT);
-        skillSelect.setMaximumSize(new Dimension(Integer.MAX_VALUE, skillSelect.getPreferredSize().height));
-        skillSelect.addActionListener(e -> updateMethodsForSelectedSkill());
         content.add(labeled("Skill", skillSelect));
-        content.add(Box.createRigidArea(new Dimension(0, 8)));
-
-        configureSpinner(currentLevel);
-        configureSpinner(currentXp);
-        configureSpinner(targetLevel);
-        configureSpinner(targetXp);
-        wireXpLevelSync();
-
-        content.add(twoColumnFields("Current Level", currentLevel, "Current Experience", currentXp));
-        content.add(Box.createRigidArea(new Dimension(0, 8)));
-        content.add(twoColumnFields("Target Level", targetLevel, "Target Experience", targetXp));
-        content.add(Box.createRigidArea(new Dimension(0, 8)));
-
-        loadCurrentXpButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        loadCurrentXpButton.addActionListener(e -> loadCurrentXp());
-        content.add(loadCurrentXpButton);
-        content.add(Box.createRigidArea(new Dimension(0, 10)));
-        content.add(sectionDivider());
-        content.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        sortSelect.setAlignmentX(Component.LEFT_ALIGNMENT);
-        sortSelect.setMaximumSize(new Dimension(Integer.MAX_VALUE, sortSelect.getPreferredSize().height));
-        sortSelect.addActionListener(e -> updateMethodOrdering(true));
+        content.add(gap(8));
+        content.add(pair("Current level", currentLevel, "Current XP", currentXp));
+        content.add(gap(8));
+        content.add(pair("Target level", targetLevel, "Target XP", targetXp));
+        content.add(gap(8));
+        content.add(loadXp);
+        sectionBreak(content);
+        content.add(labeled("Search methods / variants", search));
+        content.add(gap(8));
         content.add(labeled("Sort", sortSelect));
-        content.add(Box.createRigidArea(new Dimension(0, 4)));
-
-        hideLockedMethods.setAlignmentX(Component.LEFT_ALIGNMENT);
-        hideLockedMethods.setToolTipText("Hide methods above your current level.");
-        hideLockedMethods.addActionListener(e -> {
-            updateMethodOrdering(true);
-            clearResult("Filter changed. Recalculate when ready.");
-        });
-        content.add(hideLockedMethods);
-        content.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        configureEntryList();
-        content.add(methodListSection());
-        content.add(Box.createRigidArea(new Dimension(0, 4)));
-
-        configureVariantSelect();
-        variantRow = labeled("Variant", variantSelect);
-        variantRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        variantRow.setVisible(false);
+        content.add(gap(6));
+        content.add(hideLocked);
+        content.add(gap(4));
+        ranking.setForeground(SUBTEXT);
+        content.add(ranking);
+        content.add(gap(8));
+        list.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        rowRenderer.add(rowName, BorderLayout.NORTH);
+        rowRenderer.add(rowDescription, BorderLayout.CENTER);
+        rowRenderer.setBorder(BorderFactory.createEmptyBorder(8, 6, 8, 6));
+        rowName.setFont(rowName.getFont().deriveFont(rowName.getFont().getSize2D() + 1));
+        rowDescription.setFont(rowDescription.getFont().deriveFont(rowDescription.getFont().getSize2D() - 1));
+        list.setCellRenderer((view, row, index, selected, focus) -> renderRow(row, selected));
+        JScrollPane methodScroll = new JScrollPane(list);
+        methodScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        methodScroll.setBorder(BorderFactory.createLineBorder(ColorScheme.MEDIUM_GRAY_COLOR));
+        methodScroll.setPreferredSize(new Dimension(200, 280));
+        methodScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 280));
+        JPanel methodSection = labeled("Method", methodScroll);
+        methodSection.setMaximumSize(new Dimension(Integer.MAX_VALUE, methodSection.getPreferredSize().height));
+        content.add(methodSection);
+        content.add(empty);
+        content.add(gap(8));
+        variantRow = labeled("Variant", variants);
+        variantRow.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
         content.add(variantRow);
-        content.add(Box.createRigidArea(new Dimension(0, 8)));
+        batchRow = labeled("Essence per batch", batchSize);
+        batchRow.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+        content.add(batchRow);
+        sectionBreak(content);
+        content.add(optional);
+        content.add(gap(6));
+        content.add(sell);
+        content.add(gap(6));
+        content.add(tax);
+        sectionBreak(content);
+        content.add(refresh);
+        content.add(gap(10));
+        content.add(renderer.getComponent());
+        for (Component component : content.getComponents())
+        {
+            if (component instanceof javax.swing.JComponent)
+            {
+                ((javax.swing.JComponent) component).setAlignmentX(Component.LEFT_ALIGNMENT);
+            }
+        }
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scroll, BorderLayout.CENTER);
 
-        includeOptionalInputs.setAlignmentX(Component.LEFT_ALIGNMENT);
-        sellOutputs.setAlignmentX(Component.LEFT_ALIGNMENT);
-        includeTax.setAlignmentX(Component.LEFT_ALIGNMENT);
-        includeOptionalInputs.addActionListener(e -> onInputsAffectingMethodListChanged("Options changed. Recalculate when ready."));
-        sellOutputs.addActionListener(e -> {
-            updateOptionState();
-            onInputsAffectingMethodListChanged("Options changed. Recalculate when ready.");
+        skillSelect.addActionListener(event -> switchSkill());
+        sortSelect.addActionListener(event -> changed(true));
+        hideLocked.addActionListener(event -> changed(true));
+        listen(search, () -> {
+            if (syncing || disposed) { return; }
+            goal().search = search.getText();
+            changed(true);
         });
-        includeTax.addActionListener(e -> onInputsAffectingMethodListChanged("Options changed. Recalculate when ready."));
-        content.add(includeOptionalInputs);
-        content.add(sellOutputs);
-        content.add(includeTax);
-        content.add(Box.createRigidArea(new Dimension(0, 8)));
-
-        calculateButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        calculateButton.addActionListener(e -> onCalculate());
-        content.add(calculateButton);
-        content.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        add(content, BorderLayout.NORTH);
-        add(resultRenderer.getComponent(), BorderLayout.CENTER);
-        updateMethodsForSelectedSkill();
-        showStatus("Select a method, enter XP manually, or load current XP from the client.");
-    }
-
-    void showStatus(String status)
-    {
-        resultRenderer.showStatus(status);
-    }
-
-    void showResult(CostResult result)
-    {
-        resultRenderer.showResult(result);
-    }
-
-    private void showStatusWarning(String status)
-    {
-        resultRenderer.showWarning(status);
-    }
-
-    // --- Skill / method list handling ---
-
-    private void updateMethodsForSelectedSkill()
-    {
-        Skill skill = (Skill) skillSelect.getSelectedItem();
-
-        // Kill any pending async XP/price updates from the previous skill before changing fields.
-        xpLoadRequestId++;
-        netSortRequestId++;
-
-        netEstimates.clear();
-        currentEntries.clear();
-        includeOptionalInputs.setSelected(true);
-        sellOutputs.setSelected(true);
-        includeTax.setSelected(true);
-
-        // Skill changes should never carry over a manually typed current XP from another skill.
-        resetCurrentXpFields();
-        clearResult("Skill changed. Loading current XP if available…");
-
-        if (skill != null)
+        for (JSpinner field : new JSpinner[]{currentLevel, currentXp, targetLevel, targetXp})
         {
-            currentEntries.addAll(MethodListEntry.build(methodsBySkill.get(skill)));
-            loadCurrentXpButton.setText("Load current " + Formats.skillName(skill) + " XP");
+            boolean current = field == currentLevel || field == currentXp;
+            boolean level = field == currentLevel || field == targetLevel;
+            field.addChangeListener(event -> edit(field, current, level));
+            listen(editor(field), () -> edit(field, current, level));
         }
-
-        updateMethodOrdering(false);
-
-        if (skill != null)
-        {
-            requestCurrentXpLoad(skill, true);
-        }
-    }
-
-    private void updateMethodOrdering(boolean userTriggered)
-    {
-        MethodSort sort = (MethodSort) sortSelect.getSelectedItem();
-        if (sort == MethodSort.MOST_PROFITABLE)
-        {
-            updateProfitSortedEntries(userTriggered);
-            return;
-        }
-
-        List<MethodListEntry> sorted = visibleEntries();
-        sorted.sort(Comparator
-            .comparingLong((MethodListEntry entry) -> actionsFor(entry.getSelected()))
-            .thenComparingInt(entry -> entry.getSelected().getRequiredLevel())
-            .thenComparing(MethodListEntry::getDisplayName));
-
-        applyEntryList(sorted);
-    }
-
-    private void updateProfitSortedEntries(boolean userTriggered)
-    {
-        if (!commitSpinnerEdits())
-        {
-            showStatus("One of the XP/level fields has an invalid value.");
-            return;
-        }
-
-        final int requestId = ++netSortRequestId;
-        int currentXpValue = ((Number) currentXp.getValue()).intValue();
-        int targetXpValue = ((Number) targetXp.getValue()).intValue();
-        boolean shouldIncludeOptionalInputs = includeOptionalInputs.isEnabled() && includeOptionalInputs.isSelected();
-        boolean shouldSellOutputs = sellOutputs.isEnabled() && sellOutputs.isSelected();
-        boolean shouldIncludeTax = includeTax.isEnabled() && includeTax.isSelected();
-
-        // Estimate every variant, not just the selected ones, so the variant dropdown can show
-        // per-bone/per-variant net gp. One price fetch covers everything.
-        List<MethodListEntry> visible = visibleEntries();
-        List<SkillingMethod> methodsToEstimate = new ArrayList<>();
-        for (MethodListEntry entry : visible)
-        {
-            methodsToEstimate.addAll(entry.getVariants());
-        }
-
-        showStatus("Fetching prices to sort by estimated profit…");
-        plugin.estimateNetForMethods(
-            methodsToEstimate,
-            currentXpValue,
-            targetXpValue,
-            shouldIncludeOptionalInputs,
-            shouldSellOutputs,
-            shouldIncludeTax,
-            estimates -> {
-                if (requestId != netSortRequestId)
-                {
-                    return;
-                }
-
-                netEstimates.clear();
-                netEstimates.putAll(estimates);
-
-                List<MethodListEntry> sorted = visibleEntries();
-                sorted.sort((left, right) -> {
-                    long leftNet = estimates.getOrDefault(left.getSelected(), Long.MIN_VALUE);
-                    long rightNet = estimates.getOrDefault(right.getSelected(), Long.MIN_VALUE);
-                    int byNet = Long.compare(rightNet, leftNet);
-                    if (byNet != 0)
-                    {
-                        return byNet;
-                    }
-                    return left.getDisplayName().compareTo(right.getDisplayName());
-                });
-
-                applyEntryList(sorted);
-
-                boolean hasGroups = false;
-                for (MethodListEntry entry : sorted)
-                {
-                    if (entry.hasVariants())
-                    {
-                        hasGroups = true;
-                        break;
-                    }
-                }
-                if (hasGroups)
-                {
-                    // Red so the user notices: grouped rows are ranked by whichever variant is
-                    // currently selected, not by their best variant.
-                    boolean isPrayer = skillSelect.getSelectedItem() == Skill.PRAYER;
-                    showStatusWarning(isPrayer
-                        ? "Method list sorted by selected bone variant. Recalculate for the full breakdown."
-                        : "Method list sorted by selected variant. Recalculate for the full breakdown.");
-                }
-                else
-                {
-                    showStatus("Sorted by estimated net. Recalculate the selected method for the full breakdown.");
-                }
-            },
-            error -> {
-                if (requestId != netSortRequestId)
-                {
-                    return;
-                }
-                showStatus(error);
-            });
-    }
-
-    /** Entries that pass the "hide locked" filter (a group counts as unlocked if any variant is). */
-    private List<MethodListEntry> visibleEntries()
-    {
-        commitSpinnerEdits();
-        List<MethodListEntry> visible = new ArrayList<>();
-        int level = ((Number) currentLevel.getValue()).intValue();
-        for (MethodListEntry entry : currentEntries)
-        {
-            if (!hideLockedMethods.isSelected() || level >= entry.getMinRequiredLevel())
+        list.addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting() && !syncing && !disposed)
             {
-                visible.add(entry);
+                rememberSelection();
+                updateControls();
+                changed(false);
             }
-        }
-        return visible;
-    }
-
-    private void applyEntryList(List<MethodListEntry> entries)
-    {
-        MethodListEntry previous = entryList.getSelectedValue();
-        updatingSelection = true;
-        entryListModel.clear();
-        for (MethodListEntry entry : entries)
-        {
-            entryListModel.addElement(entry);
-        }
-
-        if (!entryListModel.isEmpty())
-        {
-            int index = previous == null ? -1 : entryListModel.indexOf(previous);
-            entryList.setSelectedIndex(index >= 0 ? index : 0);
-        }
-        updatingSelection = false;
-        updateVariantSelector();
-        updateOptionState();
-        entryList.repaint();
-    }
-
-    private SkillingMethod selectedMethod()
-    {
-        MethodListEntry entry = entryList.getSelectedValue();
-        return entry == null ? null : entry.getSelected();
-    }
-
-    /** Syncs the variant dropdown with the selected list entry; hidden for standalone methods. */
-    private void updateVariantSelector()
-    {
-        MethodListEntry entry = entryList.getSelectedValue();
-
-        updatingVariants = true;
-        DefaultComboBoxModel<SkillingMethod> model = new DefaultComboBoxModel<>();
-        if (entry != null)
-        {
-            for (SkillingMethod variant : entry.getVariants())
-            {
-                model.addElement(variant);
-            }
-        }
-        variantSelect.setModel(model);
-        if (entry != null && model.getSize() > 0)
-        {
-            variantSelect.setSelectedIndex(entry.getSelectedVariantIndex());
-        }
-        updatingVariants = false;
-
-        boolean showVariants = entry != null && entry.hasVariants();
-        if (variantRow != null && variantRow.isVisible() != showVariants)
-        {
-            variantRow.setVisible(showVariants);
-            revalidate();
-            repaint();
-        }
-    }
-
-    private void updateOptionState()
-    {
-        SkillingMethod method = selectedMethod();
-        boolean hasMethod = method != null;
-        boolean hasOptional = hasMethod && !method.getOptionalInputs().isEmpty();
-        boolean hasOutputs = hasMethod && method.hasOutputs();
-
-        includeOptionalInputs.setEnabled(hasOptional);
-        if (hasOptional)
-        {
-            includeOptionalInputs.setText("Include optional: " + method.getOptionalInputSummary());
-        }
-        else
-        {
-            includeOptionalInputs.setText("No optional consumables");
-            includeOptionalInputs.setSelected(false);
-        }
-
-        sellOutputs.setEnabled(hasOutputs);
-        if (!hasOutputs)
-        {
-            sellOutputs.setSelected(false);
-        }
-
-        includeTax.setEnabled(hasOutputs && sellOutputs.isSelected());
-        calculateButton.setEnabled(hasMethod);
-    }
-
-    private void configureSkillRenderer()
-    {
-        ListCellRenderer<? super Skill> baseRenderer = skillSelect.getRenderer();
-        skillSelect.setRenderer((JList<? extends Skill> list, Skill value, int index, boolean isSelected, boolean cellHasFocus) -> {
-            JLabel label = (JLabel) baseRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (value != null)
-            {
-                label.setText(Formats.skillName(value));
-            }
-            return label;
         });
-    }
-
-    private void configureEntryList()
-    {
-        entryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        entryList.setVisibleRowCount(5);
-        entryList.setFixedCellHeight(64);
-        entryList.setBackground(ColorScheme.DARK_GRAY_COLOR);
-        entryList.setCellRenderer(new MethodCellRenderer());
-        entryList.addListSelectionListener(e -> {
-            if (e.getValueIsAdjusting() || updatingSelection)
-            {
-                return;
-            }
-            includeOptionalInputs.setSelected(true);
-            sellOutputs.setSelected(true);
-            updateVariantSelector();
-            updateOptionState();
-            clearResult("Method changed. Recalculate when ready.");
+        variants.addActionListener(event -> {
+            if (syncing || disposed || list.getSelectedValue() == null) { return; }
+            list.getSelectedValue().setSelectedVariantIndex(variants.getSelectedIndex());
+            rememberSelection();
+            updateControls();
+            changed(false);
         });
+        optional.addActionListener(event -> { session.optional = optional.isSelected(); changed(false); });
+        sell.addActionListener(event -> { session.sell = sell.isSelected(); changed(false); });
+        tax.addActionListener(event -> { session.tax = tax.isSelected(); changed(false); });
+        batchSize.addChangeListener(event -> editBatch());
+        listen(editor(batchSize), this::editBatch);
+        loadXp.addActionListener(event -> loadCurrentXp());
+        refresh.addActionListener(event -> { ++revision; scheduler.stop(); estimate(true); });
+        switchSkill();
     }
 
-    private void configureVariantSelect()
+    private CalculatorSession.Goal goal() { return session.goal(skill); }
+
+    private void switchSkill()
     {
-        variantSelect.setAlignmentX(Component.LEFT_ALIGNMENT);
-        variantSelect.setMaximumSize(new Dimension(Integer.MAX_VALUE, variantSelect.getPreferredSize().height));
-        ListCellRenderer<? super SkillingMethod> baseRenderer = variantSelect.getRenderer();
-        variantSelect.setRenderer((JList<? extends SkillingMethod> list, SkillingMethod value, int index, boolean isSelected, boolean cellHasFocus) -> {
-            JLabel label = (JLabel) baseRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (value != null)
-            {
-                int level = ((Number) currentLevel.getValue()).intValue();
-                String text = value.getVariantName() == null ? value.getName() : value.getVariantName();
-                // Show speed (actions) and, once a profit sort has fetched prices, cost per
-                // variant - so fastest vs cheapest bone is visible at a glance.
-                text += " | " + String.format("%,d", actionsFor(value)) + " actions";
-                Long estimate = netEstimates.get(value);
-                if (estimate != null)
-                {
-                    text += " | net " + Formats.gpCompact(estimate);
-                }
-                if (level < value.getRequiredLevel())
-                {
-                    text += " (needs lvl " + value.getRequiredLevel() + ")";
-                }
-                label.setText(text);
-            }
-            return label;
-        });
-        variantSelect.addActionListener(e -> {
-            if (updatingVariants)
-            {
-                return;
-            }
-            MethodListEntry entry = entryList.getSelectedValue();
-            int index = variantSelect.getSelectedIndex();
-            if (entry == null || index < 0 || index == entry.getSelectedVariantIndex())
-            {
-                return;
-            }
-            entry.setSelectedVariantIndex(index);
-            includeOptionalInputs.setSelected(true);
-            sellOutputs.setSelected(true);
-            updateOptionState();
-            entryList.repaint();
-            onInputsAffectingMethodListChanged("Variant changed. Recalculate when ready.");
-        });
+        if (disposed || syncing) { return; }
+        skill = (Skill) skillSelect.getSelectedItem();
+        ++xpLoadRevision;
+        syncFields();
+        changed(true);
+        if (!goal().xpLoaded) { loadCurrentXp(); }
     }
 
-    private JPanel methodListSection()
+    private void syncFields()
     {
-        JPanel panel = new JPanel(new BorderLayout(0, 4));
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.setOpaque(false);
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 315));
-        panel.add(new JLabel("Method"), BorderLayout.NORTH);
-
-        JScrollPane scrollPane = new JScrollPane(entryList);
-        scrollPane.setBorder(BorderFactory.createLineBorder(ColorScheme.MEDIUM_GRAY_COLOR));
-        scrollPane.setPreferredSize(new Dimension(0, 280));
-        scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 280));
-        panel.add(scrollPane, BorderLayout.CENTER);
-        return panel;
+        syncing = true;
+        currentXp.setValue(goal().currentXp);
+        currentLevel.setValue(CalculatorSession.level(goal().currentXp));
+        targetXp.setValue(goal().targetXp);
+        targetLevel.setValue(CalculatorSession.level(goal().targetXp));
+        search.setText(goal().search);
+        syncing = false;
+        validInputs = true;
     }
 
-    // --- XP loading and calculation ---
+    private void edit(JSpinner field, boolean current, boolean level)
+    {
+        if (syncing || disposed || skill == null) { return; }
+        ++revision;
+        estimates = Collections.emptyMap();
+        scheduler.stop();
+        goal().xpEditRevision++;
+        try
+        {
+            int value = parsed(field);
+            int xp = level ? Experience.getXpForLevel(value) : value;
+            if (current) { goal().current(xp, false); }
+            else { goal().target(xp); }
+            syncing = true;
+            (current ? (level ? currentXp : currentLevel) : (level ? targetXp : targetLevel))
+                .setValue(level ? xp : CalculatorSession.level(xp));
+            if (current && !goal().explicitTarget)
+            {
+                targetXp.setValue(goal().targetXp);
+                targetLevel.setValue(CalculatorSession.level(goal().targetXp));
+            }
+            syncing = false;
+            validateInputs();
+            validInputs = true;
+            rebuildRows();
+            renderer.showStatus("Updating estimate…");
+            scheduler.restart();
+        }
+        catch (ParseException | IllegalArgumentException exception)
+        {
+            syncing = false;
+            validInputs = false;
+            renderer.showStatus("Enter valid levels (1–99) and XP (0–200,000,000). Displayed result uses previous inputs.");
+        }
+    }
+
+    private static int parsed(JSpinner spinner) throws ParseException
+    {
+        JFormattedTextField field = editor(spinner);
+        Object parsed = field.getFormatter().stringToValue(field.getText());
+        if (!(parsed instanceof Number)) { throw new ParseException("Invalid number", 0); }
+        double value = ((Number) parsed).doubleValue();
+        SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+        int minimum = ((Number) model.getMinimum()).intValue();
+        int maximum = ((Number) model.getMaximum()).intValue();
+        if (!Double.isFinite(value) || value != Math.rint(value) || value < minimum || value > maximum)
+        {
+            throw new ParseException("Out of range", 0);
+        }
+        return (int) value;
+    }
+
+    private void validateInputs() throws ParseException
+    {
+        for (JSpinner candidate : new JSpinner[]{currentLevel, currentXp, targetLevel, targetXp, batchSize}) { parsed(candidate); }
+    }
+
+    private void editBatch()
+    {
+        if (syncing || disposed) { return; }
+        ++revision;
+        estimates = Collections.emptyMap();
+        scheduler.stop();
+        try
+        {
+            session.batchSize = parsed(batchSize);
+            validateInputs();
+            validInputs = true;
+            changed(false);
+        }
+        catch (ParseException | IllegalArgumentException exception)
+        {
+            validInputs = false;
+            renderer.showStatus("Enter a batch size from 1 to 1,000. Displayed result uses previous inputs.");
+        }
+        updateControls();
+    }
 
     private void loadCurrentXp()
     {
-        Skill skill = (Skill) skillSelect.getSelectedItem();
-        if (skill == null)
-        {
-            showStatus("No skill selected.");
-            return;
-        }
-
-        requestCurrentXpLoad(skill, false);
+        Skill requestedSkill = skill;
+        CalculatorSession.Goal requestedGoal = goal();
+        long edit = requestedGoal.xpEditRevision;
+        long loadRevision = ++xpLoadRevision;
+        controller.loadCurrentSkillXp(requestedSkill, xp -> {
+            if (disposed || loadRevision != xpLoadRevision || skill != requestedSkill || goal() != requestedGoal) { return; }
+            if (xp < 0)
+            {
+                renderer.showStatus("Log in to load XP, or enter it manually.");
+                return;
+            }
+            if (!requestedGoal.applyLoaded(xp, edit)) { return; }
+            syncFields();
+            changed(true);
+        });
     }
 
-    private void requestCurrentXpLoad(Skill skill, boolean automatic)
+    private void changed(boolean rebuild)
     {
-        final int requestId = ++xpLoadRequestId;
-        final String skillName = Formats.skillName(skill);
-
-        loadCurrentXpButton.setEnabled(false);
-        if (automatic)
+        if (syncing || disposed) { return; }
+        ++revision;
+        estimates = Collections.emptyMap();
+        if (rebuild) { rebuildRows(); }
+        else { list.repaint(); }
+        scheduler.stop();
+        if (validInputs)
         {
-            showStatus("Skill changed. Reading current " + skillName + " XP from client…");
+            renderer.showStatus(rows.isEmpty() ? "No matching methods." : "Updating estimate…");
+            scheduler.restart();
+        }
+    }
+
+    private void rebuildRows()
+    {
+        String selectedId = goal().selectedId;
+        List<MethodListEntry> visible = new ArrayList<>();
+        for (MethodListEntry row : MethodListEntry.build(methods.get(skill)))
+        {
+            MethodListEntry filtered = row.filtered(goal().search, CalculatorSession.level(goal().currentXp),
+                hideLocked.isSelected(), goal().variants.get(row.getDisplayName()));
+            if (filtered != null) { visible.add(filtered); }
+        }
+        sortRows(visible);
+        syncing = true;
+        rows.clear();
+        int selection = 0;
+        for (int i = 0; i < visible.size(); i++)
+        {
+            MethodListEntry row = visible.get(i);
+            rows.addElement(row);
+            if (row.getSelected().getId().equals(selectedId)) { selection = i; }
+        }
+        if (!rows.isEmpty()) { list.setSelectedIndex(selection); }
+        syncing = false;
+        empty.setVisible(rows.isEmpty());
+        rememberSelection();
+        updateControls();
+    }
+
+    private void sortRows(List<MethodListEntry> visible)
+    {
+        Comparator<MethodListEntry> comparator;
+        if (sortSelect.getSelectedItem() == MethodSort.MOST_PROFITABLE)
+        {
+            comparator = Comparator.comparing((MethodListEntry row) -> !available(row))
+                .thenComparing((a, b) -> available(a) && available(b)
+                    ? Long.compare(estimates.get(b.getSelected().getId()).getNet(), estimates.get(a.getSelected().getId()).getNet()) : 0);
         }
         else
         {
-            showStatus("Reading current " + skillName + " XP from client…");
+            comparator = Comparator.comparingLong(row -> row.getSelected().actionsFor(Math.max(0, goal().targetXp - goal().currentXp)));
         }
-
-        plugin.loadCurrentSkillXp(skill, xp -> {
-            if (requestId != xpLoadRequestId || skill != skillSelect.getSelectedItem())
-            {
-                return;
-            }
-
-            loadCurrentXpButton.setEnabled(true);
-
-            if (xp < 0)
-            {
-                showStatus("Could not read current " + skillName + " XP. Enter current XP manually.");
-                return;
-            }
-
-            syncingFields = true;
-            setXpSpinner(currentXp, xp);
-            setLevelSpinner(currentLevel, levelForXp(xp));
-            setTargetToNextLevelFromCurrent();
-            syncSpinnerEditor(currentXp);
-            syncSpinnerEditor(currentLevel);
-            syncSpinnerEditor(targetLevel);
-            syncSpinnerEditor(targetXp);
-            syncingFields = false;
-            updateMethodOrdering(false);
-
-            showStatus("Loaded current " + skillName + " XP: " + String.format("%,d", xp) + ". You can edit it manually if needed.");
-        });
+        visible.sort(comparator.thenComparing(MethodListEntry::getDisplayName));
     }
 
-    private void onCalculate()
+    private boolean available(MethodListEntry row)
     {
-        if (!commitSpinnerEdits())
+        CostResult result = estimates.get(row.getSelected().getId());
+        return result != null && result.isAvailable();
+    }
+
+    private void rememberSelection()
+    {
+        MethodListEntry row = list.getSelectedValue();
+        goal().selectedId = row == null ? null : row.getSelected().getId();
+        if (row != null) { goal().variants.put(row.getDisplayName(), goal().selectedId); }
+    }
+
+    private void updateControls()
+    {
+        MethodListEntry row = list.getSelectedValue();
+        SkillingMethod selected = row == null ? null : row.getSelected();
+        syncing = true;
+        variants.setModel(new DefaultComboBoxModel<>(row == null ? new SkillingMethod[0] : row.getVariants().toArray(new SkillingMethod[0])));
+        if (row != null) { variants.setSelectedIndex(row.getSelectedVariantIndex()); }
+        syncing = false;
+        variantRow.setVisible(row != null && row.hasVariants());
+        batchRow.setVisible(selected != null && selected.usesBatches());
+        refresh.setEnabled(selected != null && validInputs);
+    }
+
+    void estimate(boolean forceRefresh)
+    {
+        if (disposed || !validInputs || list.getSelectedValue() == null) { return; }
+        List<SkillingMethod> requested = new ArrayList<>();
+        if (sortSelect.getSelectedItem() == MethodSort.MOST_PROFITABLE)
         {
-            showStatus("One of the XP/level fields has an invalid value.");
-            return;
+            for (int i = 0; i < rows.size(); i++) { requested.addAll(rows.get(i).getVariants()); }
         }
+        else { requested.add(list.getSelectedValue().getSelected()); }
+        CalculationRequest request = new CalculationRequest(revision, requested, goal().selectedId,
+            goal().currentXp, goal().targetXp, CalculatorSession.level(goal().currentXp),
+            CalculatorSession.level(goal().targetXp), session.batchSize, session.optional, session.sell, session.tax, forceRefresh);
+        renderer.showStatus(forceRefresh ? "Refreshing prices…" : "Estimating…");
+        controller.estimate(request, results -> {
+            if (disposed || revision != request.revision) { return; }
+            estimates = results;
+            rebuildRows();
+            CostResult result = results.get(request.selectedId);
+            if (result != null) { renderer.showResult(result); }
+        }, message -> {
+            if (disposed || revision != request.revision) { return; }
+            estimates = Collections.emptyMap();
+            list.repaint();
+            renderer.showFailure(message);
+        });
+    }
 
-        SkillingMethod method = selectedMethod();
-        if (method == null)
+    void pricesChanged() { changed(true); }
+    void dispose() { disposed = true; ++revision; scheduler.stop(); estimates = Collections.emptyMap(); }
+
+    private Component renderRow(MethodListEntry row, boolean selected)
+    {
+        SkillingMethod method = row.getSelected();
+        rowRenderer.setBackground(selected ? ColorScheme.MEDIUM_GRAY_COLOR : ColorScheme.DARKER_GRAY_COLOR);
+        int width = Math.max(80, list.getWidth() > 0
+            ? list.getWidth() - rowRenderer.getInsets().left - rowRenderer.getInsets().right : 180);
+        rowName.setText(row.getDisplayName());
+        rowName.setForeground(TEXT);
+        String detail = "Lvl " + method.getRequiredLevel() + " · " + method.getXpPerAction() + " XP";
+        CostResult result = estimates.get(method.getId());
+        if (sortSelect.getSelectedItem() == MethodSort.MOST_PROFITABLE)
         {
-            showStatus("No method selected.");
-            return;
+            detail += " · " + (result == null ? "Net pending" : result.isAvailable() ? Formats.gpCompact(result.getNet()) : "Unavailable");
         }
-
-        int currentXpValue = ((Number) currentXp.getValue()).intValue();
-        int targetXpValue = ((Number) targetXp.getValue()).intValue();
-        int targetLevelValue = ((Number) targetLevel.getValue()).intValue();
-
-        showStatus("Calculating…");
-        plugin.calculate(
-            method,
-            currentXpValue,
-            targetLevelValue,
-            targetXpValue,
-            includeOptionalInputs.isEnabled() && includeOptionalInputs.isSelected(),
-            sellOutputs.isEnabled() && sellOutputs.isSelected(),
-            includeTax.isEnabled() && includeTax.isSelected());
+        else { detail += " · " + String.format("%,d", method.actionsFor(Math.max(0, goal().targetXp - goal().currentXp))) + " actions"; }
+        rowDescription.setText(detail);
+        rowDescription.setForeground(CalculatorSession.level(goal().currentXp) < method.getRequiredLevel() ? LOSS : SUBTEXT);
+        sizeRowText(rowName, width);
+        sizeRowText(rowDescription, width);
+        rowRenderer.setSize(width + rowRenderer.getInsets().left + rowRenderer.getInsets().right,
+            rowRenderer.getPreferredSize().height);
+        rowRenderer.doLayout();
+        return rowRenderer;
     }
 
-    // --- Spinner wiring ---
-
-    private void wireXpLevelSync()
+    private static javax.swing.JTextArea rowText()
     {
-        currentLevel.addChangeListener(e -> {
-            if (syncingFields)
-            {
-                return;
-            }
-            syncingFields = true;
-            setXpSpinner(currentXp, Experience.getXpForLevel(((Number) currentLevel.getValue()).intValue()));
-            setTargetToNextLevelFromCurrent();
-            syncingFields = false;
-            onInputsAffectingMethodListChanged("Current XP changed. Recalculate when ready.");
-        });
-
-        currentXp.addChangeListener(e -> {
-            if (syncingFields)
-            {
-                return;
-            }
-            syncingFields = true;
-            setLevelSpinner(currentLevel, levelForXp(((Number) currentXp.getValue()).intValue()));
-            setTargetToNextLevelFromCurrent();
-            syncingFields = false;
-            onInputsAffectingMethodListChanged("Current XP changed. Recalculate when ready.");
-        });
-
-        targetLevel.addChangeListener(e -> {
-            if (syncingFields)
-            {
-                return;
-            }
-            syncingFields = true;
-            setXpSpinner(targetXp, Experience.getXpForLevel(((Number) targetLevel.getValue()).intValue()));
-            syncingFields = false;
-            onInputsAffectingMethodListChanged("Target XP changed. Recalculate when ready.");
-        });
-
-        targetXp.addChangeListener(e -> {
-            if (syncingFields)
-            {
-                return;
-            }
-            syncingFields = true;
-            setLevelSpinner(targetLevel, levelForXp(((Number) targetXp.getValue()).intValue()));
-            syncingFields = false;
-            onInputsAffectingMethodListChanged("Target XP changed. Recalculate when ready.");
-        });
+        javax.swing.JTextArea area = new javax.swing.JTextArea();
+        area.setEditable(false);
+        area.setFocusable(false);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        area.setOpaque(false);
+        area.setFont(new JLabel().getFont());
+        return area;
     }
 
-    private void resetCurrentXpFields()
+    private static void sizeRowText(javax.swing.JTextArea area, int width)
     {
-        syncingFields = true;
-        setLevelSpinner(currentLevel, 1);
-        setXpSpinner(currentXp, 0);
-        setTargetToNextLevelFromCurrent();
-        syncSpinnerEditor(currentLevel);
-        syncSpinnerEditor(currentXp);
-        syncSpinnerEditor(targetLevel);
-        syncSpinnerEditor(targetXp);
-        syncingFields = false;
+        area.setPreferredSize(null);
+        area.setSize(new Dimension(width, Short.MAX_VALUE));
+        Dimension size = area.getPreferredSize();
+        size.width = width;
+        area.setPreferredSize(size);
     }
 
-    /** Commits pending text edits in all spinners; returns false if any value is invalid. */
-    private boolean commitSpinnerEdits()
+    private static JSpinner spinner(int value, int min, int max)
     {
-        try
-        {
-            currentLevel.commitEdit();
-            currentXp.commitEdit();
-            targetLevel.commitEdit();
-            targetXp.commitEdit();
-            return true;
-        }
-        catch (ParseException ex)
-        {
-            return false;
-        }
-    }
-
-    private void configureSpinner(JSpinner spinner)
-    {
-        spinner.setAlignmentX(Component.LEFT_ALIGNMENT);
-        spinner.setMaximumSize(new Dimension(Integer.MAX_VALUE, spinner.getPreferredSize().height));
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(value, min, max, 1));
         spinner.setEditor(new JSpinner.NumberEditor(spinner, "#,##0"));
+        return spinner;
     }
-
-    private void setXpSpinner(JSpinner spinner, int xp)
+    private static JFormattedTextField editor(JSpinner spinner) { return ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField(); }
+    private static void listen(JTextField field, Runnable action)
     {
-        spinner.setValue(Math.max(0, Math.min(MAX_XP, xp)));
-    }
-
-    private void setLevelSpinner(JSpinner spinner, int level)
-    {
-        spinner.setValue(Math.max(1, Math.min(MAX_SKILL_LEVEL, level)));
-    }
-
-    private void syncSpinnerEditor(JSpinner spinner)
-    {
-        if (spinner.getEditor() instanceof JSpinner.DefaultEditor)
+        field.getDocument().addDocumentListener(new DocumentListener()
         {
-            JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinner.getEditor();
-            editor.getTextField().setValue(spinner.getValue());
-        }
+            public void insertUpdate(DocumentEvent event) { action.run(); }
+            public void removeUpdate(DocumentEvent event) { action.run(); }
+            public void changedUpdate(DocumentEvent event) { action.run(); }
+        });
     }
-
-    private void setTargetToNextLevelFromCurrent()
-    {
-        int nextLevel = Math.min(MAX_SKILL_LEVEL, ((Number) currentLevel.getValue()).intValue() + 1);
-        setLevelSpinner(targetLevel, nextLevel);
-        setXpSpinner(targetXp, Experience.getXpForLevel(nextLevel));
-    }
-
-    private static int levelForXp(int xp)
-    {
-        return Math.min(MAX_SKILL_LEVEL, Experience.getLevelForXp(Math.max(0, xp)));
-    }
-
-    // --- Small layout helpers ---
-
-    private JPanel twoColumnFields(String leftLabel, Component left, String rightLabel, Component right)
-    {
-        JPanel panel = new JPanel(new GridLayout(1, 2, 8, 0));
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.setOpaque(false);
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
-        panel.add(labeled(leftLabel, left));
-        panel.add(labeled(rightLabel, right));
-        return panel;
-    }
-
-    private JPanel labeled(String label, Component component)
+    private static JPanel labeled(String label, Component component)
     {
         JPanel panel = new JPanel(new BorderLayout(0, 3));
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setOpaque(false);
         panel.add(new JLabel(label), BorderLayout.NORTH);
         panel.add(component, BorderLayout.CENTER);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
+        return panel;
+    }
+    private static JPanel pair(String left, Component a, String right, Component b)
+    {
+        JPanel panel = new JPanel(new GridLayout(1, 2, 6, 0));
+        panel.setOpaque(false);
+        panel.add(labeled(left, a));
+        panel.add(labeled(right, b));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
         return panel;
     }
 
-    private Component sectionDivider()
+    private static Component gap(int height)
     {
+        return Box.createRigidArea(new Dimension(0, height));
+    }
+
+    private static void sectionBreak(JPanel content)
+    {
+        content.add(gap(10));
         JPanel divider = new JPanel();
-        divider.setAlignmentX(Component.LEFT_ALIGNMENT);
         divider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         divider.setPreferredSize(new Dimension(1, 1));
         divider.setMinimumSize(new Dimension(1, 1));
         divider.setBackground(ColorScheme.MEDIUM_GRAY_COLOR);
-        return divider;
-    }
-
-    private void clearResult(String message)
-    {
-        plugin.invalidatePendingCalculations();
-        showStatus(message);
-    }
-
-    /**
-     * Called when an input changed that may affect list ordering or the lock filter. Re-sorts
-     * when needed; otherwise just repaints rows and asks the user to recalculate.
-     */
-    private void onInputsAffectingMethodListChanged(String message)
-    {
-        MethodSort sort = (MethodSort) sortSelect.getSelectedItem();
-        if (sort != MethodSort.MOST_PROFITABLE)
-        {
-            // Profit sorting sets its own status when the fetch finishes.
-            clearResult(message);
-        }
-        updateMethodOrdering(false);
-    }
-
-    private long actionsFor(SkillingMethod method)
-    {
-        int currentXpValue = ((Number) currentXp.getValue()).intValue();
-        int targetXpValue = ((Number) targetXp.getValue()).intValue();
-        int xpNeeded = Math.max(0, targetXpValue - currentXpValue);
-        return (long) Math.ceil(xpNeeded / method.getXpPerAction());
-    }
-
-    /**
-     * Renders one method row: a lock-state stripe on the left, the method/group name, and a
-     * detail line with level, XP/action, and either the action count or the estimated net gp
-     * (when profit sorting is active). Group rows describe their currently selected variant.
-     */
-    private final class MethodCellRenderer extends JPanel implements ListCellRenderer<MethodListEntry>
-    {
-        private final JPanel stripe = new JPanel();
-        private final JLabel name = new JLabel();
-        private final JLabel detail = new JLabel();
-        // Separate label so only the gp amount is colored, not the whole detail line.
-        private final JLabel netValue = new JLabel();
-
-        private MethodCellRenderer()
-        {
-            setLayout(new BorderLayout(8, 0));
-            setOpaque(true);
-
-            stripe.setPreferredSize(new Dimension(5, 1));
-            stripe.setOpaque(true);
-            add(stripe, BorderLayout.WEST);
-
-            JPanel textPanel = new JPanel();
-            textPanel.setOpaque(false);
-            textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-            textPanel.setBorder(BorderFactory.createEmptyBorder(5, 6, 5, 4));
-
-            name.setForeground(TEXT);
-            name.setFont(name.getFont().deriveFont(Font.PLAIN, name.getFont().getSize2D() + 1.0f));
-            detail.setForeground(SUBTEXT);
-            detail.setFont(detail.getFont().deriveFont(Font.PLAIN, detail.getFont().getSize2D() - 1.0f));
-            netValue.setFont(detail.getFont());
-
-            JPanel detailRow = new JPanel();
-            detailRow.setOpaque(false);
-            detailRow.setLayout(new BoxLayout(detailRow, BoxLayout.X_AXIS));
-            detailRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-            detailRow.add(detail);
-            detailRow.add(netValue);
-
-            name.setAlignmentX(Component.LEFT_ALIGNMENT);
-            textPanel.add(name);
-            textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
-            textPanel.add(detailRow);
-            add(textPanel, BorderLayout.CENTER);
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends MethodListEntry> list, MethodListEntry value, int index, boolean isSelected, boolean cellHasFocus)
-        {
-            SkillingMethod method = value.getSelected();
-            int level = ((Number) currentLevel.getValue()).intValue();
-            boolean unlocked = level >= method.getRequiredLevel();
-            long actions = actionsFor(method);
-
-            setBackground(isSelected ? ColorScheme.MEDIUM_GRAY_COLOR : ColorScheme.DARKER_GRAY_COLOR);
-            setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(2, 0, 2, 0),
-                BorderFactory.createLineBorder(ColorScheme.MEDIUM_GRAY_COLOR)));
-            stripe.setBackground(unlocked ? PROFIT : LOSS);
-
-            String title = value.getDisplayName();
-            if (value.hasVariants())
-            {
-                title += " (" + value.getVariants().size() + " options)";
-            }
-            name.setText(title);
-
-            MethodSort sort = (MethodSort) sortSelect.getSelectedItem();
-            String prefix = "Lvl. " + method.getRequiredLevel()
-                + " (" + method.getXpPerAction() + " xp) | ";
-
-            // Plain text only: HTML JLabels word-wrap when slightly too wide, which pushed some
-            // net values onto an invisible second line. Compact gp keeps the line short.
-            if (sort == MethodSort.MOST_PROFITABLE)
-            {
-                Long estimate = netEstimates.get(method);
-                if (estimate == null)
-                {
-                    detail.setText(prefix + "net loading…");
-                    netValue.setText("");
-                }
-                else
-                {
-                    detail.setText(prefix + "net ");
-                    netValue.setForeground(estimate >= 0 ? PROFIT : LOSS);
-                    netValue.setText(Formats.gpCompact(estimate));
-                }
-            }
-            else
-            {
-                detail.setText(prefix + String.format("%,d", actions) + " actions");
-                netValue.setText("");
-            }
-
-            return this;
-        }
+        content.add(divider);
+        content.add(gap(10));
     }
 }

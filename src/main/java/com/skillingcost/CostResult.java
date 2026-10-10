@@ -1,11 +1,14 @@
 package com.skillingcost;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 final class CostResult
 {
+    enum State { AVAILABLE, MISSING_QUOTES, OUT_OF_RANGE, INVALID_SETTINGS }
+
     private final SkillingMethod method;
     private final int currentLevel;
     private final int currentXp;
@@ -22,27 +25,15 @@ final class CostResult
     private final List<String> outputLines;
     private final boolean includeOptionalInputs;
     private final boolean sellOutputs;
-    private final long newestPriceTimestamp;
+    private final long oldestPriceTimestamp;
+    private final Instant snapshotTime;
+    private final State state;
+    private final List<String> notices;
 
-    CostResult(
-        SkillingMethod method,
-        int currentLevel,
-        int currentXp,
-        int targetLevel,
-        int targetXp,
-        int xpNeeded,
-        long actionsNeeded,
-        long inputCost,
-        long outputGross,
-        long tax,
-        long net,
-        List<String> requiredInputLines,
-        List<String> optionalInputLines,
-        List<String> outputLines,
-        boolean includeOptionalInputs,
-        boolean sellOutputs,
-        long newestPriceTimestamp
-    )
+    CostResult(SkillingMethod method, int currentLevel, int currentXp, int targetLevel, int targetXp,
+        int xpNeeded, long actionsNeeded, long inputCost, long outputGross, long tax, long net,
+        List<String> requiredLines, List<String> optionalLines, List<String> outputLines,
+        boolean optional, boolean sell, long oldestTimestamp, Instant snapshotTime, State state, List<String> notices)
     {
         this.method = method;
         this.currentLevel = currentLevel;
@@ -55,96 +46,41 @@ final class CostResult
         this.outputGross = outputGross;
         this.tax = tax;
         this.net = net;
-        this.requiredInputLines = new ArrayList<>(requiredInputLines);
-        this.optionalInputLines = new ArrayList<>(optionalInputLines);
-        this.outputLines = new ArrayList<>(outputLines);
-        this.includeOptionalInputs = includeOptionalInputs;
-        this.sellOutputs = sellOutputs;
-        this.newestPriceTimestamp = newestPriceTimestamp;
+        this.requiredInputLines = immutable(requiredLines);
+        this.optionalInputLines = immutable(optionalLines);
+        this.outputLines = immutable(outputLines);
+        this.includeOptionalInputs = optional;
+        this.sellOutputs = sell;
+        this.oldestPriceTimestamp = oldestTimestamp;
+        this.snapshotTime = snapshotTime;
+        this.state = state;
+        this.notices = immutable(notices);
     }
 
-    SkillingMethod getMethod()
+    private static List<String> immutable(List<String> values)
     {
-        return method;
+        return Collections.unmodifiableList(new ArrayList<>(values));
     }
 
-    int getCurrentLevel()
-    {
-        return currentLevel;
-    }
-
-    int getCurrentXp()
-    {
-        return currentXp;
-    }
-
-    int getTargetLevel()
-    {
-        return targetLevel;
-    }
-
-    int getTargetXp()
-    {
-        return targetXp;
-    }
-
-    int getXpNeeded()
-    {
-        return xpNeeded;
-    }
-
-    long getActionsNeeded()
-    {
-        return actionsNeeded;
-    }
-
-    long getInputCost()
-    {
-        return inputCost;
-    }
-
-    long getOutputGross()
-    {
-        return outputGross;
-    }
-
-    long getTax()
-    {
-        return tax;
-    }
-
-    long getNet()
-    {
-        return net;
-    }
-
-    List<String> getRequiredInputLines()
-    {
-        return Collections.unmodifiableList(requiredInputLines);
-    }
-
-    List<String> getOptionalInputLines()
-    {
-        return Collections.unmodifiableList(optionalInputLines);
-    }
-
-    List<String> getOutputLines()
-    {
-        return Collections.unmodifiableList(outputLines);
-    }
-
-    boolean isIncludeOptionalInputs()
-    {
-        return includeOptionalInputs;
-    }
-
-    boolean isSellOutputs()
-    {
-        return sellOutputs;
-    }
-
-    long getNewestPriceTimestamp()
-    {
-        return newestPriceTimestamp;
-    }
+    SkillingMethod getMethod() { return method; }
+    int getCurrentLevel() { return currentLevel; }
+    int getCurrentXp() { return currentXp; }
+    int getTargetLevel() { return targetLevel; }
+    int getTargetXp() { return targetXp; }
+    int getXpNeeded() { return xpNeeded; }
+    long getActionsNeeded() { return actionsNeeded; }
+    long getInputCost() { return inputCost; }
+    long getOutputGross() { return outputGross; }
+    long getTax() { return tax; }
+    long getNet() { return net; }
+    List<String> getRequiredInputLines() { return requiredInputLines; }
+    List<String> getOptionalInputLines() { return optionalInputLines; }
+    List<String> getOutputLines() { return outputLines; }
+    boolean isIncludeOptionalInputs() { return includeOptionalInputs; }
+    boolean isSellOutputs() { return sellOutputs; }
+    long getOldestPriceTimestamp() { return oldestPriceTimestamp; }
+    Instant getSnapshotTime() { return snapshotTime; }
+    State getState() { return state; }
+    boolean isAvailable() { return state == State.AVAILABLE; }
+    List<String> getNotices() { return notices; }
 }

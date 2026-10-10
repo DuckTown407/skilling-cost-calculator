@@ -1,210 +1,209 @@
 package com.skillingcost;
 
+import java.math.BigInteger;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-/**
- * Pure cost math: given a method, an action count, and a price map, computes input costs,
- * output revenue, GE tax, and net gp. No I/O and no Swing, so it is easy to unit test.
- *
- * Missing prices (untradeable or unfetched items) are treated as 0 gp rather than failing.
- */
+/** One pure calculation path for both comparison and detail views. */
 final class CostCalculator
 {
-    /** GE tax parameters, snapshotted from config at calculation time. */
     static final class TaxSettings
     {
-        private final int basisPoints;
-        private final int capGp;
-        private final int exemptBelowGp;
+        final int basisPoints;
+        final long capGp;
+        final long exemptBelowGp;
 
-        TaxSettings(int basisPoints, int capGp, int exemptBelowGp)
+        TaxSettings(int basisPoints, long capGp, long exemptBelowGp)
         {
             this.basisPoints = basisPoints;
             this.capGp = capGp;
             this.exemptBelowGp = exemptBelowGp;
         }
+
+        boolean valid()
+        {
+            return basisPoints >= 0 && basisPoints <= 10_000 && capGp >= 0 && exemptBelowGp >= 0;
+        }
     }
 
-    private CostCalculator()
+    private CostCalculator() { }
+
+    static CostResult calculate(SkillingMethod method, int currentLevel, int currentXp,
+        int targetLevel, int targetXp, boolean optional, boolean sell, boolean includeTax,
+        int batchSize, PriceSnapshot snapshot, TaxSettings tax, Instant now)
     {
-    }
-
-    /** Net gp (sell revenue - tax - input cost) without building display lines. */
-    static long estimateNet(
-        SkillingMethod method,
-        long actionsNeeded,
-        boolean includeOptionalInputs,
-        boolean sellOutputs,
-        boolean includeTax,
-        Map<Integer, WikiPrice> prices,
-        TaxSettings tax)
-    {
-        long inputCost = 0;
-        for (ItemQuantity input : method.getRequiredInputs())
-        {
-            inputCost += buyTotal(input, actionsNeeded, prices);
-        }
-        if (includeOptionalInputs)
-        {
-            for (ItemQuantity input : method.getOptionalInputs())
-            {
-                inputCost += buyTotal(input, actionsNeeded, prices);
-            }
-        }
-
-        long outputGross = 0;
-        long taxTotal = 0;
-        if (sellOutputs)
-        {
-            for (ItemQuantity output : method.getOutputs())
-            {
-                int unitSell = sellUnitPrice(output, prices);
-                long quantity = output.getTotalQuantity(actionsNeeded);
-                outputGross += quantity * unitSell;
-                taxTotal += includeTax ? geTax(unitSell, quantity, tax) : 0;
-            }
-        }
-
-        return outputGross - taxTotal - inputCost;
-    }
-
-    /** Full breakdown with per-item display lines for the result panel. */
-    static CostResult buildResult(
-        SkillingMethod method,
-        int currentLevel,
-        int currentXp,
-        int targetLevel,
-        int targetXp,
-        int xpNeeded,
-        long actionsNeeded,
-        boolean includeOptionalInputs,
-        boolean sellOutputs,
-        boolean includeTax,
-        Map<Integer, WikiPrice> prices,
-        TaxSettings tax)
-    {
+        int xpNeeded = Math.max(0, targetXp - currentXp);
+        long actions = 0;
         long inputCost = 0;
         long outputGross = 0;
-        long taxTotal = 0;
-        long newestPriceTimestamp = 0;
-        List<String> requiredInputLines = new ArrayList<>();
-        List<String> optionalInputLines = new ArrayList<>();
+        long totalTax = 0;
+        long net = 0;
+        List<String> requiredLines = new ArrayList<>();
+        List<String> optionalLines = new ArrayList<>();
         List<String> outputLines = new ArrayList<>();
-
-        for (ItemQuantity input : method.getRequiredInputs())
+        Context context = new Context(snapshot, now);
+        CostResult.State state = CostResult.State.AVAILABLE;
+        try
         {
-            inputCost += appendInputLine(input, actionsNeeded, prices, requiredInputLines, false);
-            newestPriceTimestamp = Math.max(newestPriceTimestamp, priceTimestamp(input, prices));
-        }
-        if (includeOptionalInputs)
-        {
-            for (ItemQuantity input : method.getOptionalInputs())
+            actions = method.actionsFor(xpNeeded);
+            if (includeTax && sell && method.hasSellableOutputs() && !tax.valid())
             {
-                inputCost += appendInputLine(input, actionsNeeded, prices, optionalInputLines, true);
-                newestPriceTimestamp = Math.max(newestPriceTimestamp, priceTimestamp(input, prices));
+                state = CostResult.State.INVALID_SETTINGS;
+                context.notices.add("Invalid GE tax settings. Check the plugin configuration.");
+            }
+            else
+            {
+                for (ItemQuantity input : method.getRequiredInputs())
+                {
+                    inputCost = Math.addExact(inputCost, inputLine(input, actions, batchSize, context, requiredLines));
+                }
+                if (optional)
+                {
+                    for (ItemQuantity input : method.getOptionalInputs())
+                    {
+                        inputCost = Math.addExact(inputCost, inputLine(input, actions, batchSize, context, optionalLines));
+                    }
+                }
+                int multiplier = method.outputMultiplier(currentLevel);
+                for (ItemQuantity output : method.getOutputs())
+                {
+                    long quantity = output.total(actions, batchSize, multiplier, true);
+                    if (!sell || !output.isGePriced() || quantity == 0)
+                    {
+                        outputLines.add(String.format("%,d × %s", quantity, output.getName())
+                            + (output.isGePriced() ? "\nNot sold." : "\nUntradeable; not GE-priced."));
+                        continue;
+                    }
+                    WikiPrice.Quote quote = context.quote(output, false);
+                    if (quote == null)
+                    {
+                        outputLines.add(String.format("%,d × %s\nSell quote unavailable.", quantity, output.getName()));
+                        continue;
+                    }
+                    long total = Math.multiplyExact(quantity, quote.gp);
+                    outputGross = Math.addExact(outputGross, total);
+                    totalTax = Math.addExact(totalTax, includeTax && !output.isTaxExempt()
+                        ? geTax(quote.gp, quantity, tax) : 0);
+                    outputLines.add(Formats.itemLine(output.getName(), quantity, quote.gp, total)
+                        + context.quoteNote(output, quote));
+                }
+                if (context.missing)
+                {
+                    state = CostResult.State.MISSING_QUOTES;
+                }
+                else
+                {
+                    net = Math.subtractExact(Math.subtractExact(outputGross, totalTax), inputCost);
+                }
+                if (method.hasLevelDependentOutput())
+                {
+                    context.notices.add("Output multiplier: " + multiplier + "× at starting level " + currentLevel
+                        + "; held constant throughout this estimate.");
+                }
             }
         }
-
-        if (sellOutputs)
+        catch (ArithmeticException e)
         {
-            for (ItemQuantity output : method.getOutputs())
-            {
-                int unitSell = sellUnitPrice(output, prices);
-                long quantity = output.getTotalQuantity(actionsNeeded);
-                long lineTotal = quantity * unitSell;
-                outputGross += lineTotal;
-                taxTotal += includeTax ? geTax(unitSell, quantity, tax) : 0;
-                outputLines.add(Formats.itemLine(output.getName(), quantity, unitSell, lineTotal));
-                newestPriceTimestamp = Math.max(newestPriceTimestamp, priceTimestamp(output, prices));
-            }
+            state = CostResult.State.OUT_OF_RANGE;
+            context.notices.add("Estimate exceeds the supported 64-bit quantity or GP range.");
         }
-
-        long net = outputGross - taxTotal - inputCost;
-
-        return new CostResult(
-            method,
-            currentLevel,
-            currentXp,
-            targetLevel,
-            targetXp,
-            xpNeeded,
-            actionsNeeded,
-            inputCost,
-            outputGross,
-            taxTotal,
-            net,
-            requiredInputLines,
-            optionalInputLines,
-            outputLines,
-            includeOptionalInputs,
-            sellOutputs,
-            newestPriceTimestamp);
+        return new CostResult(method, currentLevel, currentXp, targetLevel, targetXp, xpNeeded,
+            actions, inputCost, outputGross, totalTax, net, requiredLines, optionalLines, outputLines,
+            optional, sell, context.oldest, snapshot.fetchedAt, state, new ArrayList<>(context.notices));
     }
 
-    /**
-     * GE tax for one output line. Items whose unit price is below the exemption threshold are
-     * tax free; otherwise tax is {@code basisPoints/10000} of the price, capped per item.
-     */
-    static long geTax(int unitSellPrice, long quantity, TaxSettings tax)
+
+    static long geTax(long price, long quantity, TaxSettings tax)
     {
-        if (unitSellPrice < tax.exemptBelowGp)
+        if (!tax.valid() || price < 0 || quantity < 0)
         {
+            throw new IllegalArgumentException("Invalid tax inputs");
+        }
+        if (price < tax.exemptBelowGp) { return 0; }
+        long perItem = BigInteger.valueOf(price).multiply(BigInteger.valueOf(tax.basisPoints))
+            .divide(BigInteger.valueOf(10_000)).min(BigInteger.valueOf(tax.capGp)).longValueExact();
+        return Math.multiplyExact(perItem, quantity);
+    }
+
+    private static long inputLine(ItemQuantity item, long actions, int batchSize, Context context, List<String> lines)
+    {
+        long quantity = item.total(actions, batchSize, 1, false);
+        if (quantity == 0)
+        {
+            lines.add("0 × " + item.getName());
             return 0;
         }
-        long taxPerItem = ((long) unitSellPrice * tax.basisPoints) / 10_000L;
-        taxPerItem = Math.min(taxPerItem, tax.capGp);
-        return taxPerItem * quantity;
-    }
-
-    private static long appendInputLine(
-        ItemQuantity item,
-        long actionsNeeded,
-        Map<Integer, WikiPrice> prices,
-        List<String> lines,
-        boolean optional)
-    {
-        int unitBuy = buyUnitPrice(item, prices);
-        long quantity = item.getTotalQuantity(actionsNeeded);
-        long total = quantity * unitBuy;
-        String name = optional ? item.getName() + " (optional)" : item.getName();
-        lines.add(Formats.itemLine(name, quantity, unitBuy, total));
+        if (item.getPricing() == ItemQuantity.Pricing.UNTRADEABLE)
+        {
+            lines.add(String.format("%,d × %s\nUntradeable; collect these supplies. Not GE-priced.", quantity, item.getName()));
+            return 0;
+        }
+        if (item.hasFixedUnitPrice())
+        {
+            long total = Math.multiplyExact(quantity, item.getFixedUnitPrice());
+            lines.add(Formats.itemLine(item.getName(), quantity, item.getFixedUnitPrice(), total) + "\nFixed fee.");
+            return total;
+        }
+        WikiPrice.Quote quote = context.quote(item, true);
+        if (quote == null)
+        {
+            lines.add(String.format("%,d × %s\nBuy quote unavailable.", quantity, item.getName()));
+            return 0;
+        }
+        long total = Math.multiplyExact(quantity, quote.gp);
+        lines.add(Formats.itemLine(item.getName(), quantity, quote.gp, total) + context.quoteNote(item, quote));
         return total;
     }
 
-    private static long buyTotal(ItemQuantity item, long actionsNeeded, Map<Integer, WikiPrice> prices)
+    private static final class Context
     {
-        return item.getTotalQuantity(actionsNeeded) * (long) buyUnitPrice(item, prices);
-    }
+        final PriceSnapshot snapshot;
+        final Instant now;
+        final Set<String> notices = new LinkedHashSet<>();
+        boolean missing;
+        long oldest;
 
-    private static int buyUnitPrice(ItemQuantity item, Map<Integer, WikiPrice> prices)
-    {
-        if (item.hasFixedUnitPrice())
+        Context(PriceSnapshot snapshot, Instant now)
         {
-            return item.getFixedUnitPrice();
+            this.snapshot = snapshot;
+            this.now = now;
         }
-        WikiPrice price = prices.get(item.getItemId());
-        return price == null ? 0 : price.getInstantBuyPrice();
-    }
 
-    private static int sellUnitPrice(ItemQuantity item, Map<Integer, WikiPrice> prices)
-    {
-        if (item.hasFixedUnitPrice())
+        WikiPrice.Quote quote(ItemQuantity item, boolean buy)
         {
-            return item.getFixedUnitPrice();
+            WikiPrice price = snapshot.prices.get(item.getItemId());
+            WikiPrice.Quote quote = price == null ? null : buy ? price.buyQuote() : price.sellQuote();
+            if (quote == null)
+            {
+                missing = true;
+                notices.add("Quote unavailable: " + item.getName());
+            }
+            return quote;
         }
-        WikiPrice price = prices.get(item.getItemId());
-        return price == null ? 0 : price.getInstantSellPrice();
-    }
 
-    private static long priceTimestamp(ItemQuantity item, Map<Integer, WikiPrice> prices)
-    {
-        if (item.hasFixedUnitPrice())
+        String quoteNote(ItemQuantity item, WikiPrice.Quote quote)
         {
-            return 0;
+            String note = "\n" + quote.side + (quote.fallback ? " (fallback)" : "");
+            if (quote.fallback)
+            {
+                notices.add("Opposite-side quote used: " + item.getName());
+            }
+            if (quote.timestamp == null || quote.timestamp > now.getEpochSecond())
+            {
+                notices.add("Quote age unknown: " + item.getName());
+                return note + "; age unknown.";
+            }
+            oldest = oldest == 0 ? quote.timestamp : Math.min(oldest, quote.timestamp);
+            long age = now.getEpochSecond() - quote.timestamp;
+            if (age > 600)
+            {
+                notices.add("Quote older than ten minutes: " + item.getName());
+                note += "; stale";
+            }
+            return note + "; " + Instant.ofEpochSecond(quote.timestamp) + ".";
         }
-        WikiPrice price = prices.get(item.getItemId());
-        return price == null ? 0 : price.getNewestTimestamp();
     }
 }

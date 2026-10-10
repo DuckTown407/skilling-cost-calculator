@@ -4,106 +4,68 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-/**
- * One row in the method list. Either a standalone method, or a group of variants (e.g. every
- * bone offered at a gilded altar) shown as a single row with a variant dropdown.
- */
+/** One row ranks its selected eligible variant. */
 final class MethodListEntry
 {
     private final String displayName;
     private final List<SkillingMethod> variants;
     private int selectedVariantIndex;
 
-    private MethodListEntry(String displayName, List<SkillingMethod> variants)
+    private MethodListEntry(String name, List<SkillingMethod> variants)
     {
-        this.displayName = displayName;
-        this.variants = variants;
+        this.displayName = name;
+        this.variants = Collections.unmodifiableList(new ArrayList<>(variants));
     }
 
-    /** Collapses a flat method list into rows, preserving order of first appearance. */
     static List<MethodListEntry> build(List<SkillingMethod> methods)
     {
-        Map<String, List<SkillingMethod>> byGroup = new LinkedHashMap<>();
-        List<MethodListEntry> entries = new ArrayList<>();
-        // Placeholder inserted into 'entries' where each group first appears, replaced below.
-        Map<String, Integer> groupPositions = new LinkedHashMap<>();
-
+        Map<String, List<SkillingMethod>> groups = new LinkedHashMap<>();
         for (SkillingMethod method : methods)
         {
-            String group = method.getGroupName();
-            if (group == null)
-            {
-                entries.add(new MethodListEntry(method.getName(), Collections.singletonList(method)));
-                continue;
-            }
-            List<SkillingMethod> variants = byGroup.get(group);
-            if (variants == null)
-            {
-                variants = new ArrayList<>();
-                byGroup.put(group, variants);
-                groupPositions.put(group, entries.size());
-                entries.add(null);
-            }
-            variants.add(method);
+            String key = method.getGroupName() == null ? method.getId() : method.getGroupName();
+            groups.computeIfAbsent(key, ignored -> new ArrayList<>()).add(method);
         }
-
-        for (Map.Entry<String, Integer> position : groupPositions.entrySet())
+        List<MethodListEntry> result = new ArrayList<>();
+        for (List<SkillingMethod> group : groups.values())
         {
-            entries.set(position.getValue(),
-                new MethodListEntry(position.getKey(), byGroup.get(position.getKey())));
+            SkillingMethod first = group.get(0);
+            result.add(new MethodListEntry(first.getGroupName() == null ? first.getName() : first.getGroupName(), group));
         }
-        return entries;
+        return result;
     }
 
-    String getDisplayName()
+    MethodListEntry filtered(String search, int level, boolean hideLocked, String preferredId)
     {
-        return displayName;
-    }
-
-    boolean hasVariants()
-    {
-        return variants.size() > 1;
-    }
-
-    List<SkillingMethod> getVariants()
-    {
-        return Collections.unmodifiableList(variants);
-    }
-
-    SkillingMethod getSelected()
-    {
-        return variants.get(selectedVariantIndex);
-    }
-
-    int getSelectedVariantIndex()
-    {
-        return selectedVariantIndex;
-    }
-
-    void setSelectedVariantIndex(int index)
-    {
-        if (index >= 0 && index < variants.size())
-        {
-            selectedVariantIndex = index;
-        }
-    }
-
-    /** Lowest level requirement across variants; used by the "hide locked" filter. */
-    int getMinRequiredLevel()
-    {
-        int min = Integer.MAX_VALUE;
+        String query = search.trim().toLowerCase(Locale.ROOT);
+        boolean groupMatch = displayName.toLowerCase(Locale.ROOT).contains(query);
+        List<SkillingMethod> eligible = new ArrayList<>();
         for (SkillingMethod method : variants)
         {
-            min = Math.min(min, method.getRequiredLevel());
+            boolean match = groupMatch || method.getName().toLowerCase(Locale.ROOT).contains(query)
+                || (method.getVariantName() != null && method.getVariantName().toLowerCase(Locale.ROOT).contains(query));
+            if (match && (!hideLocked || method.getRequiredLevel() <= level)) { eligible.add(method); }
         }
-        return min;
+        if (eligible.isEmpty()) { return null; }
+        MethodListEntry result = new MethodListEntry(displayName, eligible);
+        for (int i = 0; i < eligible.size(); i++)
+        {
+            if (eligible.get(i).getId().equals(preferredId)) { result.selectedVariantIndex = i; }
+        }
+        return result;
     }
 
-    @Override
-    public String toString()
+    String getDisplayName() { return displayName; }
+    boolean hasVariants() { return variants.size() > 1; }
+    List<SkillingMethod> getVariants() { return variants; }
+    SkillingMethod getSelected() { return variants.get(selectedVariantIndex); }
+    int getSelectedVariantIndex() { return selectedVariantIndex; }
+    void setSelectedVariantIndex(int index)
     {
-        return displayName;
+        if (index >= 0 && index < variants.size()) { selectedVariantIndex = index; }
     }
+    @Override
+    public String toString() { return displayName; }
 }

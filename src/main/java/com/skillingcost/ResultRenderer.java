@@ -13,23 +13,70 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import javax.swing.JToggleButton;
 import net.runelite.client.ui.ColorScheme;
 
 /**
- * Owns the scrollable result area at the bottom of the panel and knows how to render either a
- * one-line status message or a full {@link CostResult} breakdown into it.
+ * Keeps loading/failure status separate from main totals and expandable exact resources.
  */
 final class ResultRenderer
 {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z")
         .withZone(ZoneId.systemDefault());
 
-    private final JPanel resultPanel = new JPanel();
+    private final JPanel container = new JPanel();
+    private final JTextArea status = new JTextArea()
+    {
+        @Override
+        public Dimension getPreferredSize()
+        {
+            int width = Math.max(80, container.getWidth() > 0 ? container.getWidth() : 200);
+            setSize(new Dimension(width, Short.MAX_VALUE));
+            Dimension size = super.getPreferredSize();
+            size.width = width;
+            return size;
+        }
+
+        @Override
+        public Dimension getMaximumSize()
+        {
+            Dimension size = getPreferredSize();
+            size.width = Integer.MAX_VALUE;
+            return size;
+        }
+    };
+    private final JPanel resultPanel = new ScrollablePanel();
+    private final JPanel details = new JPanel();
+    private final JToggleButton expand = new JToggleButton("<html>Resources and<br>assumptions</html>");
+    private CostResult displayed;
+    private boolean addingDetails;
     private final JScrollPane scrollPane = new JScrollPane(resultPanel);
 
     ResultRenderer()
     {
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.setOpaque(false);
+        status.setEditable(false);
+        status.setFocusable(false);
+        status.setLineWrap(true);
+        status.setWrapStyleWord(true);
+        status.setOpaque(false);
+        status.setForeground(SkillingCostPanel.SUBTEXT);
+        status.setVisible(false);
+        status.setAlignmentX(Component.LEFT_ALIGNMENT);
+        container.add(status);
+        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
+        details.setOpaque(false);
+        details.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        details.setAlignmentX(Component.LEFT_ALIGNMENT);
+        expand.setAlignmentX(Component.LEFT_ALIGNMENT);
+        expand.addActionListener(event -> {
+            details.setVisible(expand.isSelected());
+            finishRender();
+        });
+        container.add(scrollPane);
+        scrollPane.setPreferredSize(new Dimension(200, 280));
+        scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 280));
         resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
         resultPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         resultPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
@@ -46,41 +93,75 @@ final class ResultRenderer
     }
 
     /** The component to embed in the plugin panel. */
-    JScrollPane getComponent()
+    JPanel getComponent()
     {
-        return scrollPane;
+        return container;
     }
 
-    void showStatus(String status)
+    void showStatus(String message)
     {
-        resultPanel.removeAll();
-        addPlain(status);
-        finishRender();
+        status.setText(message);
+        status.setVisible(!message.isEmpty());
+        container.revalidate();
+        container.repaint();
     }
 
-    /** Like {@link #showStatus} but in red, for notices the user should not miss. */
-    void showWarning(String status)
+    void showFailure(String message)
     {
-        resultPanel.removeAll();
-        addPlain(status, SkillingCostPanel.LOSS);
-        finishRender();
+        showStatus(message + (displayed == null ? "" : "\nDisplayed result uses the previous snapshot and inputs."));
     }
+
+    CostResult displayedResult() { return displayed; }
+    String statusText() { return status.getText(); }
 
     void showResult(CostResult result)
     {
+        displayed = result;
+        status.setText("");
+        status.setVisible(false);
         resultPanel.removeAll();
-
-        addSummaryLine("Net", Formats.gp(result.getNet()), result.getNet() >= 0);
-        if (result.getXpNeeded() > 0)
+        details.removeAll();
+        addingDetails = false;
+        if (result.isAvailable())
         {
-            addLine("GP/XP", String.format("%.2f", (double) result.getNet() / result.getXpNeeded()));
+            addSummaryLine("Net", Formats.gpCompact(result.getNet()), result.getNet() >= 0);
+            if (result.getXpNeeded() > 0)
+            {
+                addLine("GP/XP", Formats.gpPerXp(result.getNet(), result.getXpNeeded()));
+            }
+            addLine("Inputs", Formats.gpCompact(result.getInputCost()));
+            addLine("Outputs", Formats.gpCompact(result.getOutputGross()));
+            addLine("Tax", Formats.gpCompact(result.getTax()));
+        }
+        else
+        {
+            addHeader(result.getState() == CostResult.State.OUT_OF_RANGE ? "Estimate out of range" : "Estimate unavailable");
         }
         addLine("Actions", String.format("%,d", result.getActionsNeeded()));
         addLine("XP needed", String.format("%,d", result.getXpNeeded()));
-        addLine("Input cost", Formats.gp(result.getInputCost()));
-        addLine("Output gross", Formats.gp(result.getOutputGross()));
-        addLine("GE tax", Formats.gp(result.getTax()));
-
+        addPlain("Action: " + result.getMethod().getActionUnit());
+        boolean fallback = result.getNotices().stream().anyMatch(note -> note.startsWith("Opposite-side"));
+        boolean stale = result.getNotices().stream().anyMatch(note -> note.startsWith("Quote older"));
+        boolean unknownAge = result.getNotices().stream().anyMatch(note -> note.startsWith("Quote age unknown"));
+        if (fallback) { addPlain("Fallback quote used; see resources."); }
+        if (stale) { addPlain("Stale quote: older than ten minutes."); }
+        if (unknownAge) { addPlain("Quote age unknown; see resources."); }
+        if (result.getState() == CostResult.State.MISSING_QUOTES) { addPlain("Required buy or sell quotes are missing."); }
+        if (result.getState() == CostResult.State.INVALID_SETTINGS) { addPlain("Check GE tax settings in plugin config."); }
+        if (result.getMethod().hasLevelDependentOutput()) { addPlain("Yield uses the starting level throughout."); }
+        resultPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+        resultPanel.add(expand);
+        resultPanel.add(details);
+        details.setVisible(expand.isSelected());
+        addingDetails = true;
+        if (result.isAvailable())
+        {
+            addPlain("Exact net: " + Formats.gp(result.getNet()));
+            addPlain("Exact inputs: " + Formats.gp(result.getInputCost()));
+            addPlain("Exact output gross: " + Formats.gp(result.getOutputGross()));
+            addPlain("Exact tax: " + Formats.gp(result.getTax()));
+        }
+        for (String notice : result.getNotices()) { addPlain(notice); }
         addSpacer();
         addHeader("Method");
         addPlain(result.getMethod().getName());
@@ -109,29 +190,26 @@ final class ResultRenderer
 
         addSpacer();
         addHeader("Outputs");
-        if (result.isSellOutputs() && !result.getOutputLines().isEmpty())
+        for (String line : result.getOutputLines()) { addBlock(line); }
+        if (result.getOutputLines().isEmpty()) { addPlain("No output."); }
+
+        addSpacer();
+        addHeader("Assumptions");
+        addPlain(result.getMethod().getAssumptions().isEmpty() ? "Standard recipe; equipment and travel excluded." : result.getMethod().getAssumptions());
+        addPlain("Source: " + result.getMethod().getSource());
+        if (!result.getSnapshotTime().equals(Instant.EPOCH))
         {
-            for (String line : result.getOutputLines())
-            {
-                addBlock(line);
-            }
-        }
-        else if (result.getMethod().hasOutputs())
-        {
-            addPlain("Not sold.");
-        }
-        else
-        {
-            addPlain("No sellable output.");
+            addPlain("Snapshot fetched: " + TIME_FORMATTER.format(result.getSnapshotTime()));
         }
 
-        if (result.getNewestPriceTimestamp() > 0)
+        if (result.getOldestPriceTimestamp() > 0)
         {
             addSpacer();
-            addPlain("Newest price timestamp:");
-            addPlain(TIME_FORMATTER.format(Instant.ofEpochSecond(result.getNewestPriceTimestamp())));
+            addPlain("Oldest used quote:");
+            addPlain(TIME_FORMATTER.format(Instant.ofEpochSecond(result.getOldestPriceTimestamp())));
         }
 
+        addingDetails = false;
         finishRender();
     }
 
@@ -139,39 +217,48 @@ final class ResultRenderer
     {
         resultPanel.revalidate();
         resultPanel.repaint();
-        // Jump back to the top whenever new content is rendered.
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
+        container.revalidate();
+        container.repaint();
     }
 
     private void addHeader(String text)
     {
         JLabel label = new JLabel("<html><b>" + escape(text) + "</b></html>");
+        label.setForeground(SkillingCostPanel.TEXT);
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        resultPanel.add(label);
+        (addingDetails ? details : resultPanel).add(label);
     }
 
     private void addSummaryLine(String name, String value, boolean positive)
     {
         JPanel row = new JPanel(new GridLayout(1, 2, 4, 0));
         row.setOpaque(false);
+        row.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
-        row.add(new JLabel(html("<b>" + escape(name) + "</b>")));
+        JLabel nameLabel = new JLabel(html("<b>" + escape(name) + "</b>"));
+        nameLabel.setForeground(SkillingCostPanel.TEXT);
+        row.add(nameLabel);
         JLabel valueLabel = new JLabel(html("<b>" + escape(value) + "</b>"));
         valueLabel.setForeground(positive ? SkillingCostPanel.PROFIT : SkillingCostPanel.LOSS);
         row.add(valueLabel);
-        resultPanel.add(row);
+        (addingDetails ? details : resultPanel).add(row);
     }
 
     private void addLine(String name, String value)
     {
         JPanel row = new JPanel(new GridLayout(1, 2, 4, 0));
         row.setOpaque(false);
+        row.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 24));
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
-        row.add(new JLabel(html("<b>" + escape(name) + "</b>")));
-        row.add(new JLabel(html(escape(value))));
-        resultPanel.add(row);
+        JLabel nameLabel = new JLabel(html("<b>" + escape(name) + "</b>"));
+        JLabel valueLabel = new JLabel(html(escape(value)));
+        nameLabel.setForeground(SkillingCostPanel.TEXT);
+        valueLabel.setForeground(SkillingCostPanel.TEXT);
+        row.add(nameLabel);
+        row.add(valueLabel);
+        (addingDetails ? details : resultPanel).add(row);
     }
 
     /** Adds a multi-line item block (one JTextArea per line, followed by a small gap). */
@@ -181,7 +268,7 @@ final class ResultRenderer
         {
             addPlain(line);
         }
-        resultPanel.add(Box.createRigidArea(new Dimension(0, 4)));
+        (addingDetails ? details : resultPanel).add(Box.createRigidArea(new Dimension(0, 4)));
     }
 
     /**
@@ -225,16 +312,16 @@ final class ResultRenderer
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         area.setOpaque(false);
-        area.setBorder(BorderFactory.createEmptyBorder());
+        area.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
         area.setForeground(color);
         area.setFont(new JLabel().getFont());
         area.setAlignmentX(Component.LEFT_ALIGNMENT);
-        resultPanel.add(area);
+        (addingDetails ? details : resultPanel).add(area);
     }
 
     private void addSpacer()
     {
-        resultPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+        (addingDetails ? details : resultPanel).add(Box.createRigidArea(new Dimension(0, 8)));
     }
 
     private static String html(String body)

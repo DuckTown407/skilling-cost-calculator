@@ -1,71 +1,76 @@
 package com.skillingcost;
 
-/**
- * An item and how much of it one action consumes or produces.
- *
- * Quantities may be fractional (e.g. one jug of wine covering many libation offerings); the
- * total over a calculation is rounded per {@code roundUpTotal}. Items with a fixed unit price
- * (e.g. flat NPC fees, item id -1) skip the GE price lookup entirely.
- */
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+/** Explicit pricing and exact consumption units for one resource. */
 final class ItemQuantity
 {
+    enum Pricing { GE, FIXED_GP, UNTRADEABLE }
+
     private final int itemId;
     private final String name;
-    private final double quantityPerAction;
-    private final boolean roundUpTotal;
-    private final int fixedUnitPrice;
+    private final BigDecimal quantityPerAction;
+    private final Pricing pricing;
+    private final long fixedUnitPrice;
+    private final int unitsPerItem;
+    private final boolean perBatch;
+    private final boolean taxExempt;
 
-    ItemQuantity(int itemId, String name, double quantityPerAction)
+    ItemQuantity(int itemId, String name, double quantity)
     {
-        this(itemId, name, quantityPerAction, true);
+        this(itemId, name, BigDecimal.valueOf(quantity), Pricing.GE, 0, 1, false, false);
     }
 
-    ItemQuantity(int itemId, String name, double quantityPerAction, boolean roundUpTotal)
+    ItemQuantity(int itemId, String name, double quantity, long fixedPrice)
     {
-        this(itemId, name, quantityPerAction, roundUpTotal, -1);
+        this(itemId, name, BigDecimal.valueOf(quantity), Pricing.FIXED_GP, fixedPrice, 1, false, false);
     }
 
-    ItemQuantity(int itemId, String name, double quantityPerAction, boolean roundUpTotal, int fixedUnitPrice)
+    ItemQuantity(int itemId, String name, BigDecimal quantity, Pricing pricing, long fixedPrice,
+        int unitsPerItem, boolean perBatch, boolean taxExempt)
     {
+        if (name == null || name.trim().isEmpty() || quantity == null || quantity.signum() < 0
+            || pricing == null || unitsPerItem < 1 || fixedPrice < 0
+            || (pricing != Pricing.FIXED_GP && itemId <= 0))
+        {
+            throw new IllegalArgumentException("Invalid resource: " + name);
+        }
         this.itemId = itemId;
         this.name = name;
-        this.quantityPerAction = quantityPerAction;
-        this.roundUpTotal = roundUpTotal;
-        this.fixedUnitPrice = fixedUnitPrice;
+        this.quantityPerAction = quantity;
+        this.pricing = pricing;
+        this.fixedUnitPrice = fixedPrice;
+        this.unitsPerItem = unitsPerItem;
+        this.perBatch = perBatch;
+        this.taxExempt = taxExempt;
     }
 
-    int getItemId()
-    {
-        return itemId;
-    }
+    int getItemId() { return itemId; }
+    String getName() { return name; }
+    BigDecimal getQuantityPerAction() { return quantityPerAction; }
+    Pricing getPricing() { return pricing; }
+    boolean isGePriced() { return pricing == Pricing.GE; }
+    boolean hasFixedUnitPrice() { return pricing == Pricing.FIXED_GP; }
+    long getFixedUnitPrice() { return fixedUnitPrice; }
+    boolean isTaxExempt() { return taxExempt; }
+    boolean isPerBatch() { return perBatch; }
 
-    String getName()
+    long total(long actions, int batchSize, int multiplier, boolean output)
     {
-        return name;
-    }
-
-    double getQuantityPerAction()
-    {
-        return quantityPerAction;
-    }
-
-    boolean hasFixedUnitPrice()
-    {
-        return fixedUnitPrice >= 0;
-    }
-
-    int getFixedUnitPrice()
-    {
-        return fixedUnitPrice;
-    }
-
-    long getTotalQuantity(long actions)
-    {
-        double raw = actions * quantityPerAction;
-        if (roundUpTotal)
+        if (actions < 0 || batchSize < 1 || multiplier < 1)
         {
-            return (long) Math.ceil(raw);
+            throw new IllegalArgumentException("Invalid action or batch count");
         }
-        return Math.round(raw);
+        long units = perBatch ? ceilDivide(actions, batchSize) : actions;
+        return quantityPerAction.multiply(BigDecimal.valueOf(units))
+            .multiply(BigDecimal.valueOf(output ? multiplier : 1))
+            .divide(BigDecimal.valueOf(unitsPerItem), 0, output ? RoundingMode.FLOOR : RoundingMode.CEILING)
+            .longValueExact();
+    }
+
+    private static long ceilDivide(long value, int divisor)
+    {
+        return value / divisor + (value % divisor == 0 ? 0 : 1);
     }
 }

@@ -1,34 +1,51 @@
 package com.skillingcost;
 
+/** Immutable trade quotes; absence is distinct from a zero GP valuation. */
 final class WikiPrice
 {
-    private Integer high;
-    private Integer low;
-    private Long highTime;
-    private Long lowTime;
+    private final Long high;
+    private final Long low;
+    private final Long highTime;
+    private final Long lowTime;
 
-    int getInstantBuyPrice()
+    WikiPrice(Long high, Long low, Long highTime, Long lowTime)
     {
-        if (high != null && high > 0)
-        {
-            return high;
-        }
-        return low != null && low > 0 ? low : 0;
+        this.high = positive(high);
+        this.low = positive(low);
+        this.highTime = positive(highTime);
+        this.lowTime = positive(lowTime);
     }
 
-    int getInstantSellPrice()
+    Quote buyQuote()
     {
-        if (low != null && low > 0)
-        {
-            return low;
-        }
-        return high != null && high > 0 ? high : 0;
+        return high != null ? new Quote(high, highTime, false, "instant buy")
+            : low != null ? new Quote(low, lowTime, true, "instant sell") : null;
     }
 
-    long getNewestTimestamp()
+    Quote sellQuote()
     {
-        long hi = highTime == null ? 0 : highTime;
-        long lo = lowTime == null ? 0 : lowTime;
-        return Math.max(hi, lo);
+        return low != null ? new Quote(low, lowTime, false, "instant sell")
+            : high != null ? new Quote(high, highTime, true, "instant buy") : null;
+    }
+
+    private static Long positive(Long value)
+    {
+        return value != null && value > 0 ? value : null;
+    }
+
+    static final class Quote
+    {
+        final long gp;
+        final Long timestamp;
+        final boolean fallback;
+        final String side;
+
+        Quote(long gp, Long timestamp, boolean fallback, String side)
+        {
+            this.gp = gp;
+            this.timestamp = timestamp;
+            this.fallback = fallback;
+            this.side = side;
+        }
     }
 }

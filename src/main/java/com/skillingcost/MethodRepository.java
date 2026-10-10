@@ -3,124 +3,88 @@ package com.skillingcost;
 import com.google.gson.Gson;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Skill;
 
-/**
- * Loads and caches all skilling methods from the bundled {@code methods.json} resource.
- *
- * Most methods are listed verbatim in the JSON. Prayer is special-cased: the JSON only contains
- * a table of bones (bury XP + blessed bone shards) and ashes, and this class expands that table
- * into one method group per way of offering them (bury, gilded altar, chaos altar, Ectofuntus,
- * libation bowl with regular or sunfire wine, scatter). Adding a new bone to the JSON therefore
- * automatically adds it to every offering method.
- */
+/** Loads the bundled catalog and expands Prayer offerings. Preload off the client thread. */
 @Singleton
 final class MethodRepository
 {
     private static final String RESOURCE = "/methods.json";
-
-    // Offering multipliers, all relative to bury XP. See e.g.
-    // https://oldschool.runescape.wiki/w/Prayer#Bones
-    private static final double GILDED_ALTAR_MULTIPLIER = 3.5;
-    // Chaos altar offerings give gilded-altar XP with a 50% chance to not consume the bone,
-    // so on average each bone consumed is worth double: 7x bury XP.
-    private static final double CHAOS_ALTAR_MULTIPLIER = 7.0;
-    private static final double ECTOFUNTUS_MULTIPLIER = 4.0;
-    // Libation bowl XP is per blessed bone shard: 5 XP with blessed wine, 6 with sunfire wine.
-    private static final double XP_PER_SHARD_WINE = 5.0;
-    private static final double XP_PER_SHARD_SUNFIRE = 6.0;
-    // Consumption rates carried over from the original hand-computed data:
-    // one jug of wine per 400 shards, one batch of sunfire splinters per 200 shards.
-    private static final double SHARDS_PER_JUG_OF_WINE = 400.0;
-    private static final double SHARDS_PER_SUNFIRE_SPLINTER = 200.0;
-
+    private static final String PRAYER_SOURCE = "https://oldschool.runescape.wiki/w/Prayer";
+    private static final EnumSet<Skill> SUPPORTED = EnumSet.of(Skill.SMITHING, Skill.HERBLORE, Skill.FISHING,
+        Skill.COOKING, Skill.PRAYER, Skill.CRAFTING, Skill.FIREMAKING, Skill.MAGIC, Skill.FLETCHING,
+        Skill.RUNECRAFT, Skill.CONSTRUCTION);
     private final Gson gson;
-
     private List<Skill> supportedSkills;
     private Map<Skill, List<SkillingMethod>> methodsBySkill;
 
     @Inject
-    MethodRepository(Gson gson)
-    {
-        this.gson = gson;
-    }
+    MethodRepository(Gson gson) { this.gson = gson; }
 
-    synchronized List<Skill> getSupportedSkills()
-    {
-        load();
-        return supportedSkills;
-    }
-
-    /** Methods per skill, in display order. The returned lists must not be modified. */
-    synchronized Map<Skill, List<SkillingMethod>> getMethodsBySkill()
-    {
-        load();
-        return methodsBySkill;
-    }
+    synchronized List<Skill> getSupportedSkills() { load(); return supportedSkills; }
+    synchronized Map<Skill, List<SkillingMethod>> getMethodsBySkill() { load(); return methodsBySkill; }
 
     private void load()
     {
-        if (methodsBySkill != null)
+        if (methodsBySkill != null) { return; }
+        try (InputStream stream = MethodRepository.class.getResourceAsStream(RESOURCE))
         {
-            return;
+            if (stream == null) { throw new IllegalStateException("Missing bundled " + RESOURCE); }
+            read(new InputStreamReader(stream, StandardCharsets.UTF_8));
         }
+        catch (Exception exception)
+        {
+            throw new IllegalStateException("Invalid bundled catalog: " + exception.getMessage(), exception);
+        }
+    }
 
-        RootJson root;
-        try (InputStream in = MethodRepository.class.getResourceAsStream(RESOURCE))
-        {
-            if (in == null)
-            {
-                throw new IllegalStateException("Missing bundled resource " + RESOURCE);
-            }
-            root = gson.fromJson(new InputStreamReader(in, StandardCharsets.UTF_8), RootJson.class);
-        }
-        catch (Exception e)
-        {
-            throw new IllegalStateException("Failed to load " + RESOURCE + ": " + e.getMessage(), e);
-        }
+    synchronized void read(Reader reader)
+    {
+        RootJson root = gson.fromJson(reader, RootJson.class);
         if (root == null || root.skills == null || root.methods == null || root.prayer == null)
         {
-            throw new IllegalStateException(RESOURCE + " is malformed");
+            throw new IllegalArgumentException("Missing skills, methods, or Prayer table");
         }
-
         List<Skill> skills = new ArrayList<>();
         Map<Skill, List<SkillingMethod>> map = new LinkedHashMap<>();
-        for (String skillName : root.skills)
+        for (String name : root.skills)
         {
-            Skill skill = Skill.valueOf(skillName);
+            Skill skill = Skill.valueOf(name);
+            if (!SUPPORTED.contains(skill) || map.containsKey(skill))
+            {
+                throw new IllegalArgumentException("Invalid or duplicate skill: " + name);
+            }
             skills.add(skill);
             map.put(skill, new ArrayList<>());
         }
-
-        for (MethodJson method : root.methods)
+        if (!map.keySet().equals(SUPPORTED))
         {
-            Skill skill = Skill.valueOf(method.skill);
-            map.get(skill).add(new SkillingMethod(
-                skill,
-                method.name,
-                method.group,
-                method.variant,
-                method.level,
-                method.xp,
-                toItems(method.inputs),
-                toItems(method.optional),
-                toItems(method.outputs)));
+            throw new IllegalArgumentException("Catalog must contain the 11 supported skills");
         }
-
-        List<SkillingMethod> prayer = map.get(Skill.PRAYER);
-        if (prayer != null)
+        Set<String> identities = new HashSet<>();
+        for (MethodJson recipe : root.methods)
         {
-            prayer.addAll(expandPrayer(root.prayer));
+            Skill skill = Skill.valueOf(recipe.skill);
+            if (!map.containsKey(skill)) { throw new IllegalArgumentException("Unsupported skill: " + recipe.skill); }
+            SkillingMethod method = new SkillingMethod(skill, recipe.key, recipe.name, recipe.group, recipe.variant,
+                recipe.level, recipe.xp, toItems(recipe.inputs), toItems(recipe.optional),
+                toItems(recipe.outputs), recipe.action, recipe.source, recipe.assumptions, recipe.outputLevels);
+            add(map, method, identities);
         }
-
+        for (SkillingMethod method : expandPrayer(root.prayer)) { add(map, method, identities); }
         for (Map.Entry<Skill, List<SkillingMethod>> entry : map.entrySet())
         {
             entry.setValue(Collections.unmodifiableList(entry.getValue()));
@@ -129,117 +93,110 @@ final class MethodRepository
         methodsBySkill = Collections.unmodifiableMap(map);
     }
 
-    /** Expands the bones/ashes tables into full method groups. */
+    private static void add(Map<Skill, List<SkillingMethod>> map, SkillingMethod method, Set<String> ids)
+    {
+        if (!ids.add(method.getId())) { throw new IllegalArgumentException("Duplicate recipe: " + method.getId()); }
+        map.get(method.getSkill()).add(method);
+    }
+
     private static List<SkillingMethod> expandPrayer(PrayerJson prayer)
     {
+        if (prayer.bones == null || prayer.ashes == null || prayer.libationMinLevel < 1
+            || prayer.libationMinLevel > 99 || prayer.libationFeeGp < 0)
+        {
+            throw new IllegalArgumentException("Invalid Prayer table");
+        }
         List<SkillingMethod> methods = new ArrayList<>();
-
         for (BoneJson bone : prayer.bones)
         {
-            methods.add(boneMethod("Bury", bone, bone.level, bone.buryXp,
-                items(bone(bone))));
+            if (!Double.isFinite(bone.buryXp) || bone.buryXp <= 0 || bone.shards <= 0)
+            {
+                throw new IllegalArgumentException("Invalid bone: " + bone.name);
+            }
+            methods.add(boneMethod("bury", "Bury", bone, bone.level, bone.buryXp,
+                items(ref(bone, BigDecimal.ONE)), "One bone buried."));
+            methods.add(boneMethod("gilded", "Gilded altar (both burners lit)", bone, bone.level, bone.buryXp * 3.5,
+                items(ref(bone, BigDecimal.ONE)), "Both burners lit. Burner and travel costs excluded."));
+            methods.add(boneMethod("chaos", "Chaos altar (avg. 50% bone save)", bone, bone.level, bone.buryXp * 7,
+                items(ref(bone, BigDecimal.ONE)), "Long-run average XP per consumed bone; actual bone saves vary. Travel and risk excluded."));
+            methods.add(boneMethod("ecto", "Ectofuntus", bone, bone.level, bone.buryXp * 4,
+                items(ref(bone, BigDecimal.ONE), ref(prayer.bucketOfSlime, BigDecimal.ONE)),
+                "Collected slime required. Empty pots, returned buckets, travel, and grinding costs excluded."));
+            for (boolean sunfire : new boolean[]{false, true})
+            {
+                List<ItemQuantity> inputs = items(ref(bone, BigDecimal.ONE),
+                    new ItemQuantity(-1, "Virilis unnoting fee", 1, prayer.libationFeeGp),
+                    ref(prayer.jugOfWine, BigDecimal.valueOf(bone.shards).divide(BigDecimal.valueOf(400))));
+                if (sunfire)
+                {
+                    inputs.add(ref(prayer.sunfireSplinters,
+                        BigDecimal.valueOf(bone.shards).divide(BigDecimal.valueOf(200))));
+                }
+                methods.add(boneMethod(sunfire ? "sunfire" : "blessed",
+                    sunfire ? "Libation bowl (sunfire wine)" : "Libation bowl (blessed wine)", bone,
+                    Math.max(prayer.libationMinLevel, bone.level), bone.shards * (sunfire ? 6.0 : 5.0), inputs,
+                    "One action processes all shards from one bone. Wine/splinters rounded over the whole plan. No Zealot shard saves; collection and travel excluded."));
+            }
         }
-        for (BoneJson bone : prayer.bones)
-        {
-            methods.add(boneMethod("Gilded altar (both burners lit)", bone, bone.level,
-                bone.buryXp * GILDED_ALTAR_MULTIPLIER, items(bone(bone))));
-        }
-        for (BoneJson bone : prayer.bones)
-        {
-            methods.add(boneMethod("Chaos altar (avg. 50% bone save)", bone, bone.level,
-                bone.buryXp * CHAOS_ALTAR_MULTIPLIER, items(bone(bone))));
-        }
-        for (BoneJson bone : prayer.bones)
-        {
-            methods.add(boneMethod("Ectofuntus", bone, bone.level,
-                bone.buryXp * ECTOFUNTUS_MULTIPLIER,
-                items(bone(bone), ref(prayer.bucketOfSlime, 1))));
-        }
-        for (BoneJson bone : prayer.bones)
-        {
-            methods.add(boneMethod("Libation bowl (blessed wine)", bone,
-                Math.max(prayer.libationMinLevel, bone.level),
-                bone.shards * XP_PER_SHARD_WINE,
-                items(bone(bone), unnotingFee(prayer),
-                    ref(prayer.jugOfWine, bone.shards / SHARDS_PER_JUG_OF_WINE))));
-        }
-        for (BoneJson bone : prayer.bones)
-        {
-            methods.add(boneMethod("Libation bowl (sunfire wine)", bone,
-                Math.max(prayer.libationMinLevel, bone.level),
-                bone.shards * XP_PER_SHARD_SUNFIRE,
-                items(bone(bone), unnotingFee(prayer),
-                    ref(prayer.jugOfWine, bone.shards / SHARDS_PER_JUG_OF_WINE),
-                    ref(prayer.sunfireSplinters, bone.shards / SHARDS_PER_SUNFIRE_SPLINTER))));
-        }
-
         for (AshJson ash : prayer.ashes)
         {
-            methods.add(new SkillingMethod(Skill.PRAYER,
-                "Scatter " + ash.name.toLowerCase(),
-                "Scatter ashes", ash.name,
-                ash.level, ash.scatterXp,
-                items(new ItemQuantity(ash.id, ash.name, 1)),
-                Collections.emptyList(), Collections.emptyList()));
+            methods.add(new SkillingMethod(Skill.PRAYER, "prayer:scatter:" + ash.resource,
+                "Scatter " + ash.name, "Scatter ashes", ash.name, ash.level, ash.scatterXp,
+                items(ref(ash, BigDecimal.ONE)), Collections.emptyList(), Collections.emptyList(),
+                "ash scattered", PRAYER_SOURCE, "One ash scattered.", new int[0]));
         }
-
         return methods;
     }
 
-    private static SkillingMethod boneMethod(String group, BoneJson bone, int level, double xp, List<ItemQuantity> inputs)
+    private static SkillingMethod boneMethod(String key, String group, BoneJson bone, int level, double xp,
+        List<ItemQuantity> inputs, String assumptions)
     {
-        return new SkillingMethod(Skill.PRAYER,
-            group + " - " + bone.name.toLowerCase(),
-            group, bone.name,
-            level, xp,
-            inputs, Collections.emptyList(), Collections.emptyList());
+        return new SkillingMethod(Skill.PRAYER, "prayer:" + key + ":" + bone.resource,
+            group + " - " + bone.name, group, bone.name, level, xp, inputs,
+            Collections.emptyList(), Collections.emptyList(), "bone processed", PRAYER_SOURCE, assumptions, new int[0]);
     }
 
-    private static ItemQuantity bone(BoneJson bone)
+    private static ItemQuantity ref(ItemRefJson item, BigDecimal quantity)
     {
-        return new ItemQuantity(bone.id, bone.name, 1);
+        if (item == null) { throw new IllegalArgumentException("Missing Prayer supply"); }
+        ItemQuantity.Pricing pricing = pricing(item.pricing);
+        if (pricing == ItemQuantity.Pricing.FIXED_GP) { throw new IllegalArgumentException("Prayer item is a fee"); }
+        return new ItemQuantity(ResourceRegistry.require(item.resource), item.name, quantity, pricing,
+            0, 1, false, false);
     }
 
-    private static ItemQuantity ref(ItemRefJson item, double quantityPerAction)
+    private static ItemQuantity.Pricing pricing(String value)
     {
-        return new ItemQuantity(item.id, item.name, quantityPerAction);
+        if (value == null) { throw new IllegalArgumentException("Missing pricing mode"); }
+        return ItemQuantity.Pricing.valueOf(value);
     }
 
-    private static ItemQuantity unnotingFee(PrayerJson prayer)
-    {
-        // Virilis outside the libation altar un-notes bones for a flat gp fee per bone.
-        return new ItemQuantity(-1, "Virilis unnoting fee", 1, true, prayer.libationFeeGp);
-    }
-
-    private static List<ItemQuantity> items(ItemQuantity... entries)
+    private static List<ItemQuantity> items(ItemQuantity... values)
     {
         List<ItemQuantity> list = new ArrayList<>();
-        Collections.addAll(list, entries);
+        Collections.addAll(list, values);
         return list;
     }
 
-    private static List<ItemQuantity> toItems(List<ItemJson> items)
+    private static List<ItemQuantity> toItems(List<ItemJson> values)
     {
-        List<ItemQuantity> out = new ArrayList<>();
-        if (items == null)
+        List<ItemQuantity> list = new ArrayList<>();
+        if (values == null) { return list; }
+        for (ItemJson item : values)
         {
-            return out;
-        }
-        for (ItemJson item : items)
-        {
-            if (item.fixedPrice != null)
+            ItemQuantity.Pricing mode = pricing(item.pricing);
+            if ((mode == ItemQuantity.Pricing.FIXED_GP) != (item.fixedPrice != null)
+                || (mode == ItemQuantity.Pricing.FIXED_GP && item.resource != null))
             {
-                out.add(new ItemQuantity(item.id, item.name, item.qty, true, item.fixedPrice));
+                throw new IllegalArgumentException("Inconsistent pricing: " + item.name);
             }
-            else
-            {
-                out.add(new ItemQuantity(item.id, item.name, item.qty));
-            }
+            int id = mode == ItemQuantity.Pricing.FIXED_GP ? -1 : ResourceRegistry.require(item.resource);
+            list.add(new ItemQuantity(id, item.name, item.qty, mode,
+                item.fixedPrice == null ? 0 : item.fixedPrice,
+                item.unitsPerItem == null ? 1 : item.unitsPerItem, item.perBatch, item.taxExempt));
         }
-        return out;
+        return list;
     }
-
-    // --- Gson DTOs mirroring methods.json ---
 
     private static final class RootJson
     {
@@ -250,57 +207,45 @@ final class MethodRepository
 
     private static final class MethodJson
     {
-        String skill;
-        String name;
-        String group;
-        String variant;
+        String key, skill, name, group, variant, action, source, assumptions;
         int level;
         double xp;
-        List<ItemJson> inputs;
-        List<ItemJson> optional;
-        List<ItemJson> outputs;
+        int[] outputLevels;
+        List<ItemJson> inputs, optional, outputs;
     }
 
     private static final class ItemJson
     {
-        int id;
-        String name;
-        double qty;
-        Integer fixedPrice;
+        String resource, name, pricing;
+        BigDecimal qty;
+        Long fixedPrice;
+        Integer unitsPerItem;
+        boolean perBatch, taxExempt;
+    }
+
+    private static class ItemRefJson
+    {
+        String resource, name, pricing;
+    }
+
+    private static final class BoneJson extends ItemRefJson
+    {
+        int level, shards;
+        double buryXp;
+    }
+
+    private static final class AshJson extends ItemRefJson
+    {
+        int level;
+        double scatterXp;
     }
 
     private static final class PrayerJson
     {
         int libationMinLevel;
-        int libationFeeGp;
-        ItemRefJson jugOfWine;
-        ItemRefJson sunfireSplinters;
-        ItemRefJson bucketOfSlime;
+        long libationFeeGp;
+        ItemRefJson jugOfWine, sunfireSplinters, bucketOfSlime;
         List<BoneJson> bones;
         List<AshJson> ashes;
-    }
-
-    /** A bare item reference (no quantity) used by the generated Prayer methods. */
-    private static final class ItemRefJson
-    {
-        int id;
-        String name;
-    }
-
-    private static final class BoneJson
-    {
-        int id;
-        String name;
-        int level;
-        double buryXp;
-        int shards;
-    }
-
-    private static final class AshJson
-    {
-        int id;
-        String name;
-        int level;
-        double scatterXp;
     }
 }

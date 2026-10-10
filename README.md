@@ -1,59 +1,94 @@
 # Skilling Cost Calculator
 
-This plugin is intended to calculate the cost/profit/loss for skilling methods. You can pretty easily figure out the initial cost of a skilling method with the skill calculator plugin, but most times you can sell the items back and recoup some of the cost. This provides a convenient way to check skilling methods against current GE prices.
+A RuneLite plugin for estimating the cost, profit or loss of a skilling goal.
+It calculates the supplies you need and how much you can recoup by selling the
+items you make, using OSRS Wiki GE prices.
 
-<img width="247" height="991" alt="image" src="docs/images/617172387-21de6f7b-ef18-4c82-8fc5-20fda4a87efb.png" />
+The catalog includes **909 methods across 11 skills**, with production variants,
+Prayer offerings and newer skilling methods.
+
+**Wiki prices** are enabled by default to fetch GE quotes. You can turn them off
+in the plugin configuration; an existing saved preference takes priority.
+
+<img width="242" alt="Calculator overview showing a Crafting goal, profitable-method sorting, global options and an estimate" src="docs/images/calculator-overview.png" />
+
+*Screenshots show the current panel with example XP and prices. Your estimates
+will use your chosen goal and the available GE quotes.*
 
 ## Current scope
 
-- Much like the skill calculator this plugin can read your current skill level/XP and allows manual input
-<img width="235" height="181" alt="image" src="docs/images/617172340-f6ca532e-c3cb-49df-8dcd-1ba0af899757.png" />
+- Reads your current level/XP when you choose a skill, with manual entry available.
+- Lets you choose a target level or XP. The first goal is your next level.
+- Remembers each skill's target, search and selected method/variant while the
+  panel is open. **Load current XP** updates your starting point while preserving
+  an explicit target.
 
-- Automatically attempts to read your current XP when switching skills
-- You can choose what level/XP you'd like to get to
-- Provides a list of available methods that can be sorted by least action or most profit (least lost in most cases)
-<img width="235" height="91" alt="image" src="docs/images/617172371-a8cd2e05-ce16-4883-94df-9c8a6ea99318.png" />
+<img width="242" alt="Current level and XP, target level and XP, and the Load current XP button" src="docs/images/xp-goal.png" />
 
+- Search for methods or variants, and optionally **Hide locked methods**.
+- Sort by **Least actions** or **Most profitable**. Profitable sorting also shows
+  the estimated net GP for each row's selected variant.
+- Scroll through the method list; methods above your current level have their
+  level/XP line highlighted in red.
 
-- Method list is scrollable
-- Method list highlights if you have the required skill level for the method
-  
-<img width="237" height="350" alt="image" src="docs/images/617172443-638fd7f6-f56c-489a-b117-c1537f02bce9.png" />
+<img width="242" alt="Search and sort controls above Crafting methods with estimated net GP" src="docs/images/methods-and-search.png" />
 
-- Optional toggle to hide methods you don't meet the requirements for
-- Uses live GE pricing to calculate profit/loss
-- Toggle to include/exclude GE tax
-- Optionally add the cost of extra supplies (like thread for d'hide)
-  
-<img width="236" height="292" alt="image" src="docs/images/617172508-2018c5fe-1146-4d0c-accd-02f0c549014e.png" />
+- Choose production variants such as buying Smithing bars or smelting them first.
+  The XP, supplies and estimate update for the chosen variant.
 
-- Click the button to run the calculation
-<img width="236" height="319" alt="image" src="docs/images/617172547-45abd9cd-ef90-4894-8108-9d33c69e8cf0.png" />
-<img width="227" height="263" alt="image" src="docs/images/617172554-a297a881-9e04-4715-97ba-fa9a2fd23506.png" />
+<img width="242" alt="Smithing methods with Mithril platebody selected and the Smelt bars variant" src="docs/images/smithing-variants.png" />
 
-- Able to look at smithing methods by buying bars or making bars
-<img width="243" height="274" alt="image" src="docs/images/617172565-6f874a82-9b93-4311-974f-c1ad934c2677.png" />
+- Changing a goal, method or option automatically updates the estimate.
+- **Include optional consumables**, **Sell outputs** and **Include GE tax** are
+  global toggles. They stay clickable and keep your choices across methods and
+  skills. Each recipe applies the relevant options; tax applies when outputs
+  are sold.
+- Shows net GP, GP/XP, input/output values, tax, actions and XP needed.
+- **Refresh prices** fetches new quotes. Other edits reuse recent prices.
 
-- Prayer method is chosen first (bury, altar, Ectofuntus, bone shards) with a dropdown to choose the bone
+<img width="242" alt="Global supply, output-sale and tax checkboxes above the automatically calculated totals" src="docs/images/options-and-estimate.png" />
 
-<img width="312" height="489" alt="image" src="docs/images/617172583-fe691b6a-65e2-413f-8bd5-2602c18b1b24.png" />
+- Expand **Resources and assumptions** for exact quantities, prices, fees and
+  requirements. Scroll through the details to see inputs, outputs and assumptions.
+- Fixed fees and collected untradeable supplies are listed explicitly. Missing
+  required quotes make an estimate unavailable.
+- Supports prices above the old integer limit, including trillion GP values.
+  Large totals use compact formatting; resource details retain exact amounts.
 
-- Once you select most profitable it will show the prices as well
+<img width="242" alt="Expanded resource details showing exact leather and thread quantities, unit prices and totals" src="docs/images/resources-breakdown.png" />
 
-<img width="388" height="635" alt="image" src="docs/images/617172615-63cd2f0d-eda6-4dc5-8bcc-59d884c97d02.png" />
+- For Prayer, choose the offering method first, then the bone or ash variant.
+- Includes burying/scattering, altars, Ectofuntus, bone shards and offering spells.
+  Chaos altar estimates use the average 50% bone save.
 
+<img width="242" alt="Prayer offerings with Chaos altar selected and Dragon bones as the variant" src="docs/images/prayer-offerings.png" />
 
-- Chaos altar uses the 50% average and buckets of slime are not included since they are untradable
+- Combination-rune recipes expose **Essence per batch**. Set it to the number you
+  process in one altar interaction, including your pouch setup.
+- Partial batches include the recipe's talisman or imbue use and binding-necklace
+  charge. Level-dependent yields use your starting level throughout the estimate.
+
+<img width="242" alt="Essence per batch set to 54 for a combination-rune estimate" src="docs/images/runecrafting-batches.png" />
 
 ## Notes
 
-The method list might need to be scrolled over to see the full name
+Estimates use the assumptions listed for each method. Cooking assumes no burns,
+wine assumes success, and chaos altar saves are an average. Equipment, quests,
+travel and incidental costs are explained in **Resources and assumptions**.
+
+Fallback, stale and unknown-age quotes are identified. If a refresh fails, any
+retained estimate is labelled as using the previous snapshot and inputs.
+
+See [catalog coverage and sources](docs/CATALOG_COVERAGE.md) and
+[price behavior](docs/PRICING.md) for more detail.
 
 ## Development
-Claude Fable 5 was used to help create this plugin
+
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the code layout, local setup and
+verification, and [the method schema](docs/METHOD_SCHEMA.md) for recipe data.
+
+## Credits
+
+GPT was used to help create this plugin and its documentation.
 
 The icon art was drawn by a wonderful artist named Nikki (I told her to make it a little janky)
-
-This readme was written by me
-
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the code layout, how method data works (methods are defined in `methods.json`, no code changes needed), calculation assumptions, and how to run locally.

@@ -16,7 +16,7 @@ public interface SkillingCostConfig extends Config
     )
     default boolean enableWikiPrices()
     {
-        return false;
+        return true;
     }
 
     @ConfigItem(
