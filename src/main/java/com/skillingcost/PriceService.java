@@ -26,7 +26,7 @@ import okhttp3.ResponseBody;
 @Singleton
 final class PriceService
 {
-    private static final String LATEST_URL = "https://prices.runescape.wiki/api/v1/osrs/latest";
+    private static final String LATEST_URL = "https://prices.runescape.wiki/api/v2/osrs/latest";
     private static final Duration CACHE_DURATION = Duration.ofSeconds(60);
 
     private final Call.Factory calls;
@@ -227,7 +227,12 @@ final class PriceService
     private String wikiUserAgent()
     {
         String agent = config.wikiUserAgent();
-        return agent == null || agent.trim().isEmpty() ? "skilling-cost-calculator RuneLite plugin" : agent.trim();
+        if (agent == null || agent.trim().isEmpty()
+            || "skilling-cost-calculator RuneLite plugin".equals(agent.trim()))
+        {
+            return SkillingCostConfig.DEFAULT_WIKI_USER_AGENT;
+        }
+        return agent.trim();
     }
 
     private static final class WaitingConsumer

@@ -7,6 +7,9 @@ import net.runelite.client.config.ConfigItem;
 @ConfigGroup("skilling-cost-calculator")
 public interface SkillingCostConfig extends Config
 {
+    String DEFAULT_WIKI_USER_AGENT =
+        "skilling-cost-calculator RuneLite plugin (contact: junk.ladybird471@proton.me)";
+
     @ConfigItem(
         keyName = "enableWikiPrices",
         name = "Enable Wiki prices",
@@ -27,7 +30,7 @@ public interface SkillingCostConfig extends Config
     )
     default String wikiUserAgent()
     {
-        return "skilling-cost-calculator RuneLite plugin";
+        return DEFAULT_WIKI_USER_AGENT;
     }
 
     @ConfigItem(

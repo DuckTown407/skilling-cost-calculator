@@ -28,6 +28,47 @@ public class PriceServiceTest
     private final PriceService service = new PriceService(calls, new Gson(), config, clock);
 
     @Test
+    public void requestsBulkV2LatestWithMaintainerContact()
+    {
+        service.getLatestSnapshot(Collections.singleton(1), false, x -> {}, this::fail);
+        Request request = calls.list.get(0).request();
+        assertEquals("GET", request.method());
+        assertEquals("https://prices.runescape.wiki/api/v2/osrs/latest", request.url().toString());
+        assertEquals("skilling-cost-calculator RuneLite plugin (contact: junk.ladybird471@proton.me)",
+            request.header("User-Agent"));
+    }
+
+    @Test
+    public void blankAndLegacySavedAgentsUseTheContactDefault()
+    {
+        for (String savedAgent : new String[] {null, "", "  ", "skilling-cost-calculator RuneLite plugin",
+            "  skilling-cost-calculator RuneLite plugin  "})
+        {
+            FakeCalls savedCalls = new FakeCalls();
+            SkillingCostConfig savedConfig = new SkillingCostConfig()
+            {
+                @Override public String wikiUserAgent() { return savedAgent; }
+            };
+            PriceService savedService = new PriceService(savedCalls, new Gson(), savedConfig, clock);
+            savedService.getLatestSnapshot(Collections.singleton(1), false, x -> {}, this::fail);
+            assertEquals("skilling-cost-calculator RuneLite plugin (contact: junk.ladybird471@proton.me)",
+                savedCalls.list.get(0).request().header("User-Agent"));
+        }
+    }
+
+    @Test
+    public void preservesCustomUserAgent()
+    {
+        SkillingCostConfig customConfig = new SkillingCostConfig()
+        {
+            @Override public String wikiUserAgent() { return "  custom-calculator contact@example.com  "; }
+        };
+        PriceService customService = new PriceService(calls, new Gson(), customConfig, clock);
+        customService.getLatestSnapshot(Collections.singleton(1), false, x -> {}, this::fail);
+        assertEquals("custom-calculator contact@example.com", calls.list.get(0).request().header("User-Agent"));
+    }
+
+    @Test
     public void sharesRequestsCachesAbsenceAndInvokesOutsideLock() throws Exception
     {
         List<PriceSnapshot> received = new ArrayList<>();

@@ -17,7 +17,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 METHODS = REPO / "src/main/resources/methods.json"
 REGISTRY = REPO / "src/main/java/com/skillingcost/ResourceRegistry.java"
-MAPPING_URL = "https://prices.runescape.wiki/api/v1/osrs/mapping"
+MAPPING_URL = "https://prices.runescape.wiki/api/v2/osrs/mapping"
 SKILLS = {"SMITHING", "HERBLORE", "FISHING", "COOKING", "PRAYER", "CRAFTING",
           "FIREMAKING", "MAGIC", "FLETCHING", "RUNECRAFT", "CONSTRUCTION"}
 MODES = {"GE", "FIXED_GP", "UNTRADEABLE"}
@@ -126,7 +126,8 @@ def compiled_constants():
 
 
 def fetch_mapping():
-    request = urllib.request.Request(MAPPING_URL, headers={"User-Agent": "skilling-cost-calculator method validator"})
+    request = urllib.request.Request(MAPPING_URL, headers={
+        "User-Agent": "skilling-cost-calculator method validator (contact: junk.ladybird471@proton.me)"})
     with urllib.request.urlopen(request, timeout=30) as response:
         return {item["id"]: item["name"] for item in json.load(response)}
 

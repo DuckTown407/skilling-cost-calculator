@@ -42,7 +42,7 @@ recipe verification. It is not a claim that every activity in the game is modele
 ## Sources and verification
 
 Resource identity uses compile-time RuneLite gameval constants and the live
-[OSRS Wiki mapping](https://prices.runescape.wiki/api/v1/osrs/mapping). Missing
+[OSRS Wiki mapping](https://prices.runescape.wiki/api/v2/osrs/mapping). Missing
 mapping entries are investigated individually; they never automatically become
 untradeable. The final canonical check covers 709 distinct resource/name
 references, including nine intentionally non-GE identities.
